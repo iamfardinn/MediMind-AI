@@ -5,10 +5,39 @@ import {
 } from 'recharts'
 import {
   Heart, Thermometer, Wind, Activity, TrendingUp,
-  Brain, Shield, Zap, ArrowUpRight, CalendarDays, Bell
+  Brain, Shield, Zap, ArrowUpRight, CalendarDays, Bell,
+  Users, UserCheck, UserPlus, Star, Crown, BadgeCheck, MoreHorizontal,
+  TrendingDown, Minus
 } from 'lucide-react'
 import { useChatStore } from '../store/useChatStore'
 import { Link } from 'react-router-dom'
+
+const CLIENTS = [
+  { name: 'Sarah Johnson',    age: 34, plan: 'Premium',  status: 'Active',   lastVisit: 'Feb 25, 2026', condition: 'Hypertension',    avatar: 'SJ', avatarColor: 'bg-rose-500' },
+  { name: 'Michael Torres',   age: 52, plan: 'Premium',  status: 'Active',   lastVisit: 'Feb 27, 2026', condition: 'Diabetes T2',     avatar: 'MT', avatarColor: 'bg-sky-500' },
+  { name: 'Aisha Patel',      age: 28, plan: 'Standard', status: 'Active',   lastVisit: 'Feb 20, 2026', condition: 'Anxiety',         avatar: 'AP', avatarColor: 'bg-emerald-500' },
+  { name: 'David Kim',        age: 61, plan: 'Premium',  status: 'Review',   lastVisit: 'Feb 15, 2026', condition: 'Cardiac Monitor', avatar: 'DK', avatarColor: 'bg-amber-500' },
+  { name: 'Elena Vasquez',    age: 45, plan: 'Standard', status: 'Active',   lastVisit: 'Feb 26, 2026', condition: 'Migraine',        avatar: 'EV', avatarColor: 'bg-purple-500' },
+  { name: 'James Okafor',     age: 39, plan: 'Premium',  status: 'Inactive', lastVisit: 'Jan 30, 2026', condition: 'Asthma',          avatar: 'JO', avatarColor: 'bg-teal-500' },
+]
+
+const REVIEWS = [
+  {
+    name: 'Sarah Johnson', avatar: 'SJ', avatarColor: 'bg-rose-500', plan: 'Premium',
+    rating: 5, date: 'Feb 26, 2026',
+    text: 'MediMind AI completely changed how I manage my hypertension. The real-time insights and AI assistant give me confidence between doctor visits. Absolutely worth every penny.',
+  },
+  {
+    name: 'Michael Torres', avatar: 'MT', avatarColor: 'bg-sky-500', plan: 'Premium',
+    rating: 5, date: 'Feb 24, 2026',
+    text: 'The symptom analyzer caught a pattern in my blood sugar readings before my doctor did. The AI explanations are clear and never alarmist. I recommend it to everyone in my diabetes support group.',
+  },
+  {
+    name: 'David Kim', avatar: 'DK', avatarColor: 'bg-amber-500', plan: 'Premium',
+    rating: 4, date: 'Feb 18, 2026',
+    text: 'Excellent platform for ongoing cardiac monitoring. The trend charts are easy to read and the AI assistant answers my questions at 2am when I\'m worried. Would love more wearable integrations.',
+  },
+]
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 20 },
@@ -17,33 +46,90 @@ const fadeUp = (delay = 0) => ({
 })
 
 function StatCard({
-  icon: Icon, label, value, unit, color, sub, index
+  icon: Icon, label, value, unit, sub, index,
+  gradientFrom, gradientTo, glowColor, trend, trendValue, barPct
 }: {
   icon: React.ElementType
   label: string
   value: string | number
   unit: string
-  color: string
   sub: string
   index: number
-}) {
+  gradientFrom: string
+  gradientTo: string
+  glowColor: string
+  trend: 'up' | 'down' | 'stable'
+  trendValue: string
+  barPct: number
+}){
+  const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus
+  const trendColor = trend === 'up' ? '#34d399' : trend === 'down' ? '#f87171' : '#94a3b8'
+
   return (
     <motion.div
       {...fadeUp(index * 0.08)}
-      className="relative overflow-hidden rounded-2xl bg-slate-800/60 border border-slate-700/50 p-6 lg:p-7 hover:border-slate-600 hover:bg-slate-800/80 transition-all duration-300 group cursor-default min-w-0"
+      className="relative overflow-hidden rounded-2xl cursor-default group"
+      style={{
+        background: 'linear-gradient(160deg, #131f35 0%, #0f172a 100%)',
+        border: `1px solid ${glowColor}33`,
+        padding: '1.6rem',
+        transition: 'border-color 0.3s, box-shadow 0.3s',
+      }}
+      whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
     >
-      <div className={`absolute -top-8 -right-8 w-28 h-28 rounded-full ${color} opacity-[0.08] group-hover:opacity-[0.15] blur-2xl transition-opacity duration-300`} />
-      <div className="flex items-start justify-between mb-4">
-        <div className={`w-10 h-10 lg:w-11 lg:h-11 rounded-xl ${color} flex items-center justify-center shrink-0`}>
+      {/* Glow blob */}
+      <div style={{
+        position: 'absolute', top: '-2.5rem', right: '-2.5rem',
+        width: '9rem', height: '9rem', borderRadius: '9999px',
+        background: `radial-gradient(circle, ${glowColor}44 0%, transparent 70%)`,
+        pointerEvents: 'none',
+      }} />
+
+      {/* Top row: icon + badge */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+        <div style={{
+          width: '2.75rem', height: '2.75rem', borderRadius: '0.875rem', flexShrink: 0,
+          background: `linear-gradient(135deg, ${gradientFrom}, ${gradientTo})`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: `0 0 18px ${glowColor}55`,
+        }}>
           <Icon className="w-5 h-5 text-white" />
         </div>
-        <span className="text-[11px] text-slate-500 bg-slate-700/60 px-2 py-0.5 rounded-full leading-5 truncate max-w-[50%] text-right">{sub}</span>
+        <span style={{
+          fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.05em',
+          padding: '0.25rem 0.6rem', borderRadius: '9999px',
+          background: `${glowColor}18`, border: `1px solid ${glowColor}33`,
+          color: glowColor,
+        }}>{sub}</span>
       </div>
-      <p className="text-2xl lg:text-3xl font-bold text-white tracking-tight">
-        {value}
-        <span className="text-sm font-normal text-slate-400 ml-1">{unit}</span>
-      </p>
-      <p className="text-sm text-slate-400 mt-1 font-medium truncate">{label}</p>
+
+      {/* Value */}
+      <div style={{ marginBottom: '0.35rem' }}>
+        <span style={{ fontSize: '2.4rem', fontWeight: 800, color: '#fff', lineHeight: 1, letterSpacing: '-0.02em' }}>
+          {value}
+        </span>
+        <span style={{ fontSize: '0.85rem', color: '#94a3b8', marginLeft: '0.35rem', fontWeight: 400 }}>{unit}</span>
+      </div>
+
+      {/* Label */}
+      <p style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 500, marginBottom: '1.1rem' }}>{label}</p>
+
+      {/* Progress bar */}
+      <div style={{ height: '4px', borderRadius: '9999px', background: 'rgba(51,65,85,0.6)', marginBottom: '1rem', overflow: 'hidden' }}>
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${barPct}%` }}
+          transition={{ duration: 1, delay: index * 0.1 + 0.3, ease: 'easeOut' }}
+          style={{ height: '100%', borderRadius: '9999px', background: `linear-gradient(90deg, ${gradientFrom}, ${gradientTo})` }}
+        />
+      </div>
+
+      {/* Trend row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+        <TrendIcon style={{ width: '0.875rem', height: '0.875rem', color: trendColor, flexShrink: 0 }} />
+        <span style={{ fontSize: '0.72rem', color: trendColor, fontWeight: 600 }}>{trendValue}</span>
+        <span style={{ fontSize: '0.72rem', color: '#64748b', marginLeft: '0.1rem' }}>vs last month</span>
+      </div>
     </motion.div>
   )
 }
@@ -98,16 +184,36 @@ export default function Dashboard() {
               Ask AI
             </Link>
           </div>
-        </motion.div>        {/* VITALS GRID */}
-        <section style={{ marginTop: '5rem' }}>
+        </motion.div>        {/* VITALS GRID */}        <section style={{ marginTop: '5rem' }}>
           <SectionHeader title="Current Vitals" subtitle="Updated based on your latest recorded entry" />
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-7">
-            <StatCard index={0} icon={Heart} label="Heart Rate" value={latest.heartRate} unit="bpm" color="bg-linear-to-br from-rose-500 to-pink-600" sub="Normal" />
-            <StatCard index={1} icon={Activity} label="Blood Pressure" value={`${latest.bloodPressureSys}/${latest.bloodPressureDia}`} unit="mmHg" color="bg-linear-to-br from-sky-500 to-blue-600" sub="Sys/Dia" />
-            <StatCard index={2} icon={Thermometer} label="Temperature" value={latest.temperature} unit="°F" color="bg-linear-to-br from-amber-500 to-orange-500" sub="Normal" />
-            <StatCard index={3} icon={Wind} label="O₂ Saturation" value={latest.oxygenSat} unit="%" color="bg-linear-to-br from-emerald-500 to-teal-600" sub="SpO₂" />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}
+               className="grid-cols-2 xl:grid-cols-4">
+            <StatCard
+              index={0} icon={Heart} label="Heart Rate"
+              value={latest.heartRate} unit="bpm" sub="Normal"
+              gradientFrom="#f43f5e" gradientTo="#ec4899"
+              glowColor="#f43f5e" trend="up" trendValue="+2 bpm" barPct={72}
+            />
+            <StatCard
+              index={1} icon={Activity} label="Blood Pressure"
+              value={`${latest.bloodPressureSys}/${latest.bloodPressureDia}`} unit="mmHg" sub="Sys / Dia"
+              gradientFrom="#0ea5e9" gradientTo="#3b82f6"
+              glowColor="#0ea5e9" trend="stable" trendValue="No change" barPct={60}
+            />
+            <StatCard
+              index={2} icon={Thermometer} label="Temperature"
+              value={latest.temperature} unit="°F" sub="Normal"
+              gradientFrom="#f59e0b" gradientTo="#f97316"
+              glowColor="#f59e0b" trend="down" trendValue="-0.2°F" barPct={55}
+            />
+            <StatCard
+              index={3} icon={Wind} label="O₂ Saturation"
+              value={latest.oxygenSat} unit="%" sub="SpO₂"
+              gradientFrom="#10b981" gradientTo="#14b8a6"
+              glowColor="#10b981" trend="up" trendValue="+1%" barPct={98}
+            />
           </div>
-        </section>        {/* CHARTS */}
+        </section>{/* CHARTS */}
         <section style={{ marginTop: '5rem' }}>
           <SectionHeader title="Trends Over Time" subtitle="6-month historical health data" />
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-7 lg:gap-8">
@@ -186,49 +292,347 @@ export default function Dashboard() {
         </section>        {/* AI TOOLS */}
         <section style={{ marginTop: '5rem', paddingBottom: '2.5rem' }}>
           <SectionHeader title="AI Tools" subtitle="Powered by Gemini 2.0 Flash — real-time intelligence" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-7">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.75rem' }}
+               className="grid-cols-1 md:grid-cols-3">
+
+            {/* ── Card 1: AI Medical Assistant ── */}
+            <motion.div
+              {...fadeUp(0.1)}
+              className="relative overflow-hidden rounded-3xl flex flex-col"
+              style={{ background: 'linear-gradient(145deg, #0c1a2e 0%, #0f172a 60%, #0c1929 100%)', border: '1px solid rgba(14,165,233,0.2)', padding: '2rem' }}
+            >
+              {/* Decorative blob */}
+              <div style={{ position: 'absolute', top: '-3rem', right: '-3rem', width: '10rem', height: '10rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(14,165,233,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
+              <div style={{ position: 'absolute', bottom: '-2rem', left: '-2rem', width: '8rem', height: '8rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+              {/* Top badge */}
+              <div className="flex items-center justify-between" style={{ marginBottom: '1.5rem' }}>
+                <span className="text-xs font-semibold text-sky-400 bg-sky-500/10 border border-sky-500/20 rounded-full" style={{ padding: '0.3rem 0.8rem' }}>Most Used</span>
+                <span className="text-xs text-slate-500">Gemini 2.0</span>
+              </div>
+
+              {/* Icon */}
+              <div style={{ width: '3.5rem', height: '3.5rem', borderRadius: '1rem', background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem', boxShadow: '0 0 24px rgba(14,165,233,0.4)' }}>
+                <Brain className="w-7 h-7 text-white" />
+              </div>
+
+              <h3 className="text-lg font-bold text-white" style={{ marginBottom: '0.6rem' }}>AI Medical Assistant</h3>
+              <p className="text-slate-400 text-sm leading-relaxed" style={{ marginBottom: '1.5rem' }}>
+                Real-time conversation with your personal AI doctor. Evidence-based guidance on any health concern, 24/7.
+              </p>
+
+              {/* Feature list */}
+              <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.75rem' }}>
+                {['Instant symptom triage', 'Drug interaction checks', 'Personalised health tips'].map(f => (
+                  <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
+                    <span style={{ width: '1.25rem', height: '1.25rem', borderRadius: '9999px', background: 'rgba(14,165,233,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Stat */}
+              <div className="flex items-center gap-2 border-t border-slate-700/40" style={{ paddingTop: '1.25rem', marginBottom: '1.25rem' }}>
+                <span className="text-2xl font-bold text-white">98%</span>
+                <span className="text-xs text-slate-400">user satisfaction rate</span>
+              </div>
+
+              {/* CTA */}
+              <Link to="/chat" className="flex items-center justify-center gap-2 rounded-xl text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
+                style={{ padding: '0.75rem', background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', boxShadow: '0 4px 20px rgba(14,165,233,0.3)' }}>
+                Start Chatting <ArrowUpRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
+
+            {/* ── Card 2: Symptom Analyzer ── */}
+            <motion.div
+              {...fadeUp(0.18)}
+              className="relative overflow-hidden rounded-3xl flex flex-col"
+              style={{ background: 'linear-gradient(145deg, #0a1f18 0%, #0f172a 60%, #0a1a14 100%)', border: '1px solid rgba(16,185,129,0.2)', padding: '2rem' }}
+            >
+              <div style={{ position: 'absolute', top: '-3rem', right: '-3rem', width: '10rem', height: '10rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(16,185,129,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
+              <div style={{ position: 'absolute', bottom: '-2rem', left: '-2rem', width: '8rem', height: '8rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(20,184,166,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+              <div className="flex items-center justify-between" style={{ marginBottom: '1.5rem' }}>
+                <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-full" style={{ padding: '0.3rem 0.8rem' }}>AI Powered</span>
+                <span className="text-xs text-slate-500">Instant Results</span>
+              </div>
+
+              <div style={{ width: '3.5rem', height: '3.5rem', borderRadius: '1rem', background: 'linear-gradient(135deg, #10b981, #14b8a6)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem', boxShadow: '0 0 24px rgba(16,185,129,0.4)' }}>
+                <Shield className="w-7 h-7 text-white" />
+              </div>
+
+              <h3 className="text-lg font-bold text-white" style={{ marginBottom: '0.6rem' }}>Symptom Analyzer</h3>
+              <p className="text-slate-400 text-sm leading-relaxed" style={{ marginBottom: '1.5rem' }}>
+                Describe symptoms in plain language. Get a detailed AI assessment with urgency level and clear next steps.
+              </p>
+
+              <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.75rem' }}>
+                {['Urgency classification', 'Condition probability', 'Action plan & next steps'].map(f => (
+                  <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
+                    <span style={{ width: '1.25rem', height: '1.25rem', borderRadius: '9999px', background: 'rgba(16,185,129,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#34d399" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <div className="flex items-center gap-2 border-t border-slate-700/40" style={{ paddingTop: '1.25rem', marginBottom: '1.25rem' }}>
+                <span className="text-2xl font-bold text-white">2.4s</span>
+                <span className="text-xs text-slate-400">average analysis time</span>
+              </div>
+
+              <Link to="/symptoms" className="flex items-center justify-center gap-2 rounded-xl text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
+                style={{ padding: '0.75rem', background: 'linear-gradient(135deg, #10b981, #14b8a6)', boxShadow: '0 4px 20px rgba(16,185,129,0.3)' }}>
+                Analyze Symptoms <ArrowUpRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
+
+            {/* ── Card 3: Real-Time Insights ── */}
+            <motion.div
+              {...fadeUp(0.26)}
+              className="relative overflow-hidden rounded-3xl flex flex-col"
+              style={{ background: 'linear-gradient(145deg, #1a1200 0%, #0f172a 60%, #1a1200 100%)', border: '1px solid rgba(245,158,11,0.2)', padding: '2rem' }}
+            >
+              <div style={{ position: 'absolute', top: '-3rem', right: '-3rem', width: '10rem', height: '10rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(245,158,11,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
+              <div style={{ position: 'absolute', bottom: '-2rem', left: '-2rem', width: '8rem', height: '8rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(249,115,22,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+              <div className="flex items-center justify-between" style={{ marginBottom: '1.5rem' }}>
+                <span className="text-xs font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full" style={{ padding: '0.3rem 0.8rem' }}>Live Data</span>
+                <span className="text-xs text-slate-500">Auto-updated</span>
+              </div>
+
+              <div style={{ width: '3.5rem', height: '3.5rem', borderRadius: '1rem', background: 'linear-gradient(135deg, #f59e0b, #f97316)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem', boxShadow: '0 0 24px rgba(245,158,11,0.4)' }}>
+                <Zap className="w-7 h-7 text-white" />
+              </div>
+
+              <h3 className="text-lg font-bold text-white" style={{ marginBottom: '0.6rem' }}>Real-Time Insights</h3>
+              <p className="text-slate-400 text-sm leading-relaxed" style={{ marginBottom: '1.5rem' }}>
+                Track vitals over time, spot trends early, and receive AI-driven alerts before small issues become serious.
+              </p>
+
+              <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.75rem' }}>
+                {['6-month trend charts', 'Smart anomaly alerts', 'Predictive health scoring'].map(f => (
+                  <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
+                    <span style={{ width: '1.25rem', height: '1.25rem', borderRadius: '9999px', background: 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <div className="flex items-center gap-2 border-t border-slate-700/40" style={{ paddingTop: '1.25rem', marginBottom: '1.25rem' }}>
+                <span className="text-2xl font-bold text-white">+31%</span>
+                <span className="text-xs text-slate-400">earlier issue detection</span>
+              </div>
+
+              <Link to="/" className="flex items-center justify-center gap-2 rounded-xl text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
+                style={{ padding: '0.75rem', background: 'linear-gradient(135deg, #f59e0b, #f97316)', boxShadow: '0 4px 20px rgba(245,158,11,0.3)' }}>
+                View Trends <ArrowUpRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
+
+          </div>
+        </section>{/* CLIENTS */}
+        <section style={{ marginTop: '5rem' }}>
+          <SectionHeader title="Clients" subtitle="Active patients and their current health plans" />
+
+          {/* Client stat pills */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}
+               className="grid-cols-2 md:grid-cols-4">
             {[
-              {
-                icon: Brain, title: 'AI Medical Assistant',
-                desc: 'Have a real-time conversation with your personal AI doctor. Get instant, evidence-based guidance on any health concern.',
-                gradient: 'from-sky-500/10 to-indigo-500/10', border: 'border-sky-500/20',
-                iconBg: 'bg-sky-500/15', iconColor: 'text-sky-400',
-                link: '/chat', linkText: 'Start Chatting', linkColor: 'text-sky-400 hover:text-sky-300'
-              },
-              {
-                icon: Shield, title: 'Symptom Analyzer',
-                desc: 'Describe your symptoms in plain language and receive a detailed AI assessment with urgency level and next steps.',
-                gradient: 'from-emerald-500/10 to-teal-500/10', border: 'border-emerald-500/20',
-                iconBg: 'bg-emerald-500/15', iconColor: 'text-emerald-400',
-                link: '/symptoms', linkText: 'Analyze Symptoms', linkColor: 'text-emerald-400 hover:text-emerald-300'
-              },
-              {
-                icon: Zap, title: 'Real-Time Insights',
-                desc: 'Track your vitals over time, spot trends early, and get AI-driven alerts before small issues become serious.',
-                gradient: 'from-amber-500/10 to-orange-500/10', border: 'border-amber-500/20',
-                iconBg: 'bg-amber-500/15', iconColor: 'text-amber-400',
-                link: '/', linkText: 'View Trends', linkColor: 'text-amber-400 hover:text-amber-300'
-              }
-            ].map(({ icon: Icon, title, desc, gradient, border, iconBg, iconColor, link, linkText, linkColor }, i) => (
+              { icon: Users,     label: 'Total Clients',  value: '1,284', change: '+12%', up: true,  iconBg: 'bg-sky-500/15',     iconColor: 'text-sky-400' },
+              { icon: UserCheck, label: 'Active',         value: '1,047', change: '+8%',  up: true,  iconBg: 'bg-emerald-500/15', iconColor: 'text-emerald-400' },
+              { icon: Crown,     label: 'Premium',        value: '386',   change: '+21%', up: true,  iconBg: 'bg-amber-500/15',   iconColor: 'text-amber-400' },
+              { icon: UserPlus,  label: 'New This Month', value: '57',    change: '-4%',  up: false, iconBg: 'bg-rose-500/15',    iconColor: 'text-rose-400' },
+            ].map(({ icon: Icon, label, value, change, up, iconBg, iconColor }, i) => (
               <motion.div
-                key={title}
-                {...fadeUp(0.1 + i * 0.08)}
-                className={`rounded-2xl p-7 lg:p-8 bg-linear-to-br ${gradient} border ${border} hover:scale-[1.02] transition-transform duration-300 flex flex-col min-w-0`}
-              >                <div className={`w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center mb-6 shrink-0`}>
+                key={label}
+                {...fadeUp(i * 0.07)}
+                className="rounded-2xl bg-slate-800/60 border border-slate-700/50"
+                style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}
+              >
+                <div className={`w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center shrink-0`}>
                   <Icon className={`w-6 h-6 ${iconColor}`} />
                 </div>
-                <h3 className="text-base font-semibold text-white mb-3">{title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed flex-1 mb-6">{desc}</p>
-                <Link
-                  to={link}
-                  className={`flex items-center gap-1.5 text-sm font-medium ${linkColor} transition-colors`}
+                <div className="min-w-0">
+                  <p className="text-2xl font-bold text-white leading-tight">{value}</p>
+                  <p className="text-xs text-slate-400 truncate" style={{ marginTop: '0.2rem' }}>{label}</p>
+                </div>
+                <span
+                  className={`text-xs font-semibold shrink-0 rounded-full ${up ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}`}
+                  style={{ marginLeft: 'auto', padding: '0.25rem 0.6rem' }}
                 >
-                  {linkText}
-                  <ArrowUpRight className="w-4 h-4 shrink-0" />
-                </Link>
+                  {change}
+                </span>
               </motion.div>
             ))}
           </div>
+
+          {/* Client table */}
+          <motion.div {...fadeUp(0.15)} className="rounded-2xl bg-slate-800/60 border border-slate-700/50 overflow-hidden">
+            <div className="flex items-center justify-between border-b border-slate-700/50" style={{ padding: '1.25rem 1.75rem' }}>
+              <h3 className="text-sm font-semibold text-white">Recent Clients</h3>
+              <button className="text-xs text-sky-400 hover:text-sky-300 transition-colors">View All</button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-xs text-slate-500 uppercase tracking-wider border-b border-slate-700/30">
+                    {['Client', 'Age', 'Condition', 'Plan', 'Last Visit', 'Status', ''].map((h, i) => (
+                      <th key={i} className={`font-medium ${h ? 'text-left' : ''}`} style={{ padding: '1rem 1.75rem' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {CLIENTS.map((c, i) => (
+                    <motion.tr
+                      key={c.name}
+                      {...fadeUp(0.1 + i * 0.05)}
+                      className="border-b border-slate-700/20 last:border-0 hover:bg-slate-700/20 transition-colors"
+                    >
+                      <td style={{ padding: '1.1rem 1.75rem' }}>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-9 h-9 rounded-full ${c.avatarColor} flex items-center justify-center text-white text-xs font-bold shrink-0`}>
+                            {c.avatar}
+                          </div>
+                          <span className="text-white font-medium whitespace-nowrap">{c.name}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding: '1.1rem 1.75rem' }} className="text-slate-400">{c.age}</td>
+                      <td style={{ padding: '1.1rem 1.75rem' }} className="text-slate-300">{c.condition}</td>
+                      <td style={{ padding: '1.1rem 1.75rem' }}>
+                        {c.plan === 'Premium' ? (
+                          <span className="flex items-center gap-1 text-amber-400 text-xs font-medium">
+                            <Crown className="w-3 h-3" /> Premium
+                          </span>
+                        ) : (
+                          <span className="text-slate-400 text-xs">Standard</span>
+                        )}
+                      </td>
+                      <td style={{ padding: '1.1rem 1.75rem' }} className="text-slate-400 whitespace-nowrap">{c.lastVisit}</td>
+                      <td style={{ padding: '1.1rem 1.75rem' }}>
+                        <span className={`text-xs font-medium rounded-full ${
+                          c.status === 'Active' ? 'bg-emerald-500/15 text-emerald-400' :
+                          c.status === 'Review' ? 'bg-amber-500/15 text-amber-400'    :
+                                                  'bg-slate-700/60 text-slate-400'
+                        }`} style={{ padding: '0.3rem 0.75rem' }}>
+                          {c.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: '1.1rem 1.75rem' }}>
+                        <button className="text-slate-500 hover:text-slate-300 transition-colors">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* PREMIUM REVIEWS */}
+        <section style={{ marginTop: '5rem', paddingBottom: '2rem' }}>
+          <SectionHeader title="Premium Client Reviews" subtitle="What our top-tier members are saying" />
+
+          {/* Review cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.75rem' }}
+               className="grid-cols-1 md:grid-cols-3">
+            {REVIEWS.map((r, i) => (
+              <motion.div
+                key={r.name}
+                {...fadeUp(0.1 + i * 0.08)}
+                className="rounded-2xl bg-slate-800/60 border border-slate-700/50 flex flex-col hover:border-slate-600 transition-colors"
+                style={{ padding: '2rem' }}
+              >
+                {/* Stars */}
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: 5 }).map((_, s) => (
+                    <Star key={s} className={`w-4 h-4 ${s < r.rating ? 'text-amber-400 fill-amber-400' : 'text-slate-600'}`} />
+                  ))}
+                </div>
+
+                {/* Quote */}
+                <p className="text-slate-300 text-sm leading-relaxed flex-1" style={{ margin: '1.25rem 0' }}>"{r.text}"</p>
+
+                {/* Author */}
+                <div className="flex items-center justify-between gap-3 border-t border-slate-700/50" style={{ paddingTop: '1.25rem' }}>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full ${r.avatarColor} flex items-center justify-center text-white text-xs font-bold shrink-0`}>
+                      {r.avatar}
+                    </div>
+                    <div>
+                      <p className="text-white text-sm font-semibold">{r.name}</p>
+                      <p className="text-slate-500 text-xs" style={{ marginTop: '0.15rem' }}>{r.date}</p>
+                    </div>
+                  </div>
+                  <span className="flex items-center gap-1 text-xs font-medium text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full shrink-0"
+                        style={{ padding: '0.3rem 0.75rem' }}>
+                    <Crown className="w-3 h-3" /> Premium
+                  </span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Overall rating summary */}
+          <motion.div
+            {...fadeUp(0.3)}
+            className="rounded-2xl bg-slate-800/60 border border-slate-700/50 flex flex-col md:flex-row items-center"
+            style={{ marginTop: '2rem', padding: '2.5rem', gap: '3rem' }}
+          >
+            {/* Score */}
+            <div className="text-center shrink-0">
+              <p className="text-6xl font-bold text-white">4.9</p>
+              <div className="flex items-center justify-center gap-1" style={{ marginTop: '0.5rem' }}>
+                {Array.from({ length: 5 }).map((_, s) => (
+                  <Star key={s} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                ))}
+              </div>
+              <p className="text-slate-500 text-xs" style={{ marginTop: '0.4rem' }}>Based on 386 reviews</p>
+            </div>
+
+            {/* Bars */}
+            <div className="flex-1 w-full" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              {[
+                { label: '5 stars', pct: 78 },
+                { label: '4 stars', pct: 16 },
+                { label: '3 stars', pct: 4  },
+                { label: '2 stars', pct: 1  },
+                { label: '1 star',  pct: 1  },
+              ].map(({ label, pct }) => (
+                <div key={label} className="flex items-center" style={{ gap: '0.75rem' }}>
+                  <span className="text-xs text-slate-400 shrink-0" style={{ width: '3.5rem' }}>{label}</span>
+                  <div className="flex-1 h-2 bg-slate-700/60 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
+                      className="h-full bg-amber-400 rounded-full"
+                    />
+                  </div>
+                  <span className="text-xs text-slate-400 shrink-0 text-right" style={{ width: '2.5rem' }}>{pct}%</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Verified badge */}
+            <div className="flex flex-col items-center shrink-0" style={{ gap: '0.75rem' }}>
+              <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
+                <BadgeCheck className="w-5 h-5" />
+                Verified Reviews
+              </div>
+              <p className="text-slate-500 text-xs text-center" style={{ maxWidth: '9rem' }}>
+                All reviews from active premium members
+              </p>
+            </div>
+          </motion.div>
         </section>
 
       </div>
