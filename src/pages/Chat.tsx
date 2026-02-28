@@ -63,14 +63,14 @@ export default function Chat() {
     'I feel chest tightness',
   ]
 
-  return (
-    <div style={{ maxWidth: '860px', margin: '0 auto', padding: '1.5rem 2rem' }}
+  return (    <div style={{ maxWidth: '860px', margin: '0 auto', padding: '3rem 2.5rem 2rem 2.5rem' }}
          className="flex flex-col h-[calc(100vh-64px)]">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between mb-4"
+        className="flex items-center justify-between"
+        style={{ marginBottom: '1.75rem' }}
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-linear-to-br from-sky-500 to-indigo-500 flex items-center justify-center animate-pulse-glow">
@@ -93,29 +93,26 @@ export default function Chat() {
             Clear
           </button>
         )}
-      </motion.div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto space-y-4 pr-1 pb-2">
+      </motion.div>      {/* Messages */}
+      <div className="flex-1 overflow-y-auto space-y-6 pr-1 pb-4">
         {messages.length === 0 && !isStreaming && (
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center h-full text-center gap-6"
+            animate={{ opacity: 1 }}            className="flex flex-col items-center justify-center h-full text-center gap-8"
           >
-            <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-sky-500/20 to-indigo-500/20 border border-sky-500/20 flex items-center justify-center">
-              <Brain className="w-10 h-10 text-sky-400" />
+            <div className="w-24 h-24 rounded-2xl bg-linear-to-br from-sky-500/20 to-indigo-500/20 border border-sky-500/20 flex items-center justify-center">
+              <Brain className="w-12 h-12 text-sky-400" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white mb-2">How can I help you today?</h2>
+              <h2 className="text-2xl font-bold text-white mb-3">How can I help you today?</h2>
               <p className="text-slate-400 max-w-md">Ask me anything about your health, symptoms, medications, or wellness tips.</p>
             </div>
-            <div className="grid grid-cols-2 gap-2 w-full max-w-lg">
+            <div className="grid grid-cols-2 gap-3 w-full max-w-lg">
               {quickPrompts.map((prompt) => (
                 <button
                   key={prompt}
                   onClick={() => { setInput(prompt); textareaRef.current?.focus() }}
-                  className="text-left text-sm px-4 py-3 rounded-xl glass hover:border-sky-500/30 hover:text-white text-slate-400 transition-all duration-200"
+                  className="text-left text-sm px-4 py-3.5 rounded-xl glass hover:border-sky-500/30 hover:text-white text-slate-400 transition-all duration-200"
                 >
                   {prompt}
                 </button>
@@ -179,15 +176,13 @@ export default function Chat() {
           </motion.div>
         )}
         <div ref={bottomRef} />
-      </div>
-
-      {/* Input Area */}
+      </div>      {/* Input Area */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mt-4"
+        style={{ marginTop: '1.5rem' }}
       >
-        <div className="glass rounded-2xl p-3 flex items-end gap-3 focus-within:border-sky-500/40 transition-colors">
+        <div className="glass rounded-2xl p-4 flex items-end gap-3 focus-within:border-sky-500/40 transition-colors">
           <textarea
             ref={textareaRef}
             value={input}

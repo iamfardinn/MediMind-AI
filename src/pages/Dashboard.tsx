@@ -48,10 +48,11 @@ function StatCard({
   )
 }
 
-function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {  return (
-    <div className="mb-6">
-      <h2 className="text-xl font-semibold text-white">{title}</h2>
-      {subtitle && <p className="text-sm text-slate-500 mt-1">{subtitle}</p>}
+function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
+  return (
+    <div style={{ marginBottom: '1.75rem' }}>
+      <h2 className="text-2xl font-semibold text-white">{title}</h2>
+      {subtitle && <p className="text-sm text-slate-500 mt-1.5">{subtitle}</p>}
     </div>
   )
 }
@@ -61,8 +62,8 @@ export default function Dashboard() {
   const latest = vitals[vitals.length - 1]
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
   return (
-    <div style={{ width: '100%', minHeight: '100vh', backgroundColor: '#0f172a' }}>      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '2.5rem 3rem 5rem 3rem' }}
-           className="space-y-12">
+    <div style={{ width: '100%', minHeight: '100vh', backgroundColor: '#0f172a' }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '3.5rem 3rem 7rem 3rem' }}>
 
         {/* PAGE HEADER */}
         <motion.div
@@ -85,8 +86,8 @@ export default function Dashboard() {
             </p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
-            <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 text-sm transition-all whitespace-nowrap">
-              <Bell className="w-4 h-4 shrink-0" />
+            <button className="flex items-center gap-2.5 px-5 py-3 rounded-xl border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 text-base font-medium transition-all whitespace-nowrap">
+              <Bell className="w-5 h-5 shrink-0" />
               Alerts
             </button>
             <Link
@@ -97,23 +98,19 @@ export default function Dashboard() {
               Ask AI
             </Link>
           </div>
-        </motion.div>
-
-        {/* VITALS GRID */}
-        <section>
+        </motion.div>        {/* VITALS GRID */}
+        <section style={{ marginTop: '5rem' }}>
           <SectionHeader title="Current Vitals" subtitle="Updated based on your latest recorded entry" />
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-5 lg:gap-6">
+          <div className="grid grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-7">
             <StatCard index={0} icon={Heart} label="Heart Rate" value={latest.heartRate} unit="bpm" color="bg-linear-to-br from-rose-500 to-pink-600" sub="Normal" />
             <StatCard index={1} icon={Activity} label="Blood Pressure" value={`${latest.bloodPressureSys}/${latest.bloodPressureDia}`} unit="mmHg" color="bg-linear-to-br from-sky-500 to-blue-600" sub="Sys/Dia" />
             <StatCard index={2} icon={Thermometer} label="Temperature" value={latest.temperature} unit="°F" color="bg-linear-to-br from-amber-500 to-orange-500" sub="Normal" />
             <StatCard index={3} icon={Wind} label="O₂ Saturation" value={latest.oxygenSat} unit="%" color="bg-linear-to-br from-emerald-500 to-teal-600" sub="SpO₂" />
           </div>
-        </section>
-
-        {/* CHARTS */}
-        <section>
+        </section>        {/* CHARTS */}
+        <section style={{ marginTop: '5rem' }}>
           <SectionHeader title="Trends Over Time" subtitle="6-month historical health data" />
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-7">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-7 lg:gap-8">
 
             {/* Heart Rate */}
             <motion.div {...fadeUp(0.15)} className="rounded-2xl bg-slate-800/60 border border-slate-700/50 p-5 lg:p-7 min-w-0">
@@ -186,12 +183,10 @@ export default function Dashboard() {
               </ResponsiveContainer>
             </motion.div>
           </div>
-        </section>
-
-        {/* AI TOOLS */}
-        <section className="pb-8">
+        </section>        {/* AI TOOLS */}
+        <section style={{ marginTop: '5rem', paddingBottom: '2.5rem' }}>
           <SectionHeader title="AI Tools" subtitle="Powered by Gemini 2.0 Flash — real-time intelligence" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-7">
             {[
               {
                 icon: Brain, title: 'AI Medical Assistant',

@@ -79,7 +79,7 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
       () => {
         const urgency: UrgencyLevel =
           symptoms.toLowerCase().includes('chest pain') ||
-          symptoms.toLowerCase().includes('can\'t breathe') ||
+          symptoms.toLowerCase().includes("can't breathe") ||
           symptoms.toLowerCase().includes('severe') ||
           severity === 'Severe'
             ? 'emergency'
@@ -104,19 +104,21 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
   }
 
   return (
-    <div style={{ maxWidth: '860px', margin: '0 auto', padding: '2rem 2rem 4rem 2rem' }}
-         className="space-y-6">
+    <div style={{ maxWidth: '860px', margin: '0 auto', padding: '3.5rem 2.5rem 6rem 2.5rem' }}>
+
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-11 h-11 rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
             <Shield className="w-5 h-5 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white">
             Symptom <span className="gradient-text">Analyzer</span>
           </h1>
         </div>
-        <p className="text-slate-400 ml-13">AI-powered symptom assessment — not a replacement for medical care</p>
+        <p className="text-slate-400 text-sm" style={{ marginLeft: '3.25rem' }}>
+          AI-powered symptom assessment — not a replacement for medical care
+        </p>
       </motion.div>
 
       {/* Form */}
@@ -124,7 +126,8 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="glass rounded-2xl p-6 space-y-5"
+        className="glass rounded-2xl"
+        style={{ marginTop: '2.5rem', padding: '2.25rem', display: 'flex', flexDirection: 'column', gap: '1.75rem' }}
       >
         {/* Symptom description */}
         <div>
@@ -140,8 +143,8 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Age */}
+        {/* Age / Severity / Duration */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Age</label>
             <input
@@ -152,8 +155,6 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
               className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white placeholder:text-slate-500 text-sm outline-none focus:border-sky-500/50 transition-colors"
             />
           </div>
-
-          {/* Severity */}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Severity</label>
             <div className="flex gap-2">
@@ -170,8 +171,6 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
               ))}
             </div>
           </div>
-
-          {/* Duration */}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Duration</label>
             <select
@@ -206,7 +205,7 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
         </div>
 
         {/* Actions */}
-        <div className="flex gap-3 pt-1">
+        <div className="flex gap-3" style={{ paddingTop: '0.5rem' }}>
           <button
             onClick={handleAnalyze}
             disabled={!symptoms.trim() || loading}
@@ -234,7 +233,8 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="glass rounded-2xl p-6 space-y-4"
+            className="glass rounded-2xl"
+            style={{ marginTop: '2.5rem', padding: '2.25rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
           >
             <div className="flex items-center justify-between flex-wrap gap-3">
               <h2 className="text-lg font-semibold text-white">AI Analysis Result</h2>
