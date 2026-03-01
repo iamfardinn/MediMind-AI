@@ -58,6 +58,7 @@ input, textarea, select {
   font-family: inherit;
   font-size: inherit;
   box-sizing: border-box;
+  padding: 0.625rem 0.875rem;  /* restore default padding stripped by * reset */
 }
 input::-webkit-inner-spin-button,
 input::-webkit-outer-spin-button { -webkit-appearance: none; }

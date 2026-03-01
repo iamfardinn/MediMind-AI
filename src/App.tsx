@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard'
 import Chat from './pages/Chat'
 import SymptomChecker from './pages/SymptomChecker'
 import Pricing from './pages/Pricing'
+import Checkout from './pages/Checkout'
 import Login from './pages/Login'
 import './App.css'
 
@@ -42,6 +43,7 @@ function App() {
                   <Route path="/chat"     element={<Chat />} />
                   <Route path="/symptoms" element={<SymptomChecker />} />
                   <Route path="/pricing"  element={<Pricing />} />
+                  <Route path="/checkout" element={<Checkout />} />
                 </Routes>
               </main>
             </>

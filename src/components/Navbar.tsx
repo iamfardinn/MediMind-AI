@@ -7,7 +7,7 @@ import { auth } from '../services/firebase'
 import { useAuthStore } from '../store/useAuthStore'
 
 const navItems = [
-  { path: '/',        label: 'Dashboard',     icon: LayoutDashboard },
+  { path: '/',        label: 'Home',          icon: LayoutDashboard },
   { path: '/chat',    label: 'AI Assistant',  icon: MessageSquare   },
   { path: '/symptoms',label: 'Symptom Check', icon: Activity        },
   { path: '/pricing', label: 'Pricing',       icon: CreditCard      },

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   Check, Minus, Zap, Shield, Crown,
   Brain, Activity, MessageSquare, Sparkles, ArrowRight, Star,
@@ -90,6 +90,7 @@ const STATS = [
 export default function Pricing() {
   const [billing, setBilling] = useState<Billing>('monthly')
   const { user } = useAuthStore()
+  const navigate = useNavigate()
 
   return (
     <div className="min-h-screen w-full" style={{ background: '#0b1221' }}>
@@ -274,16 +275,22 @@ export default function Pricing() {
                         ${plan.monthly}/mo billed monthly
                       </p>
                     )}
-                  </div>
-
-                  {/* CTA */}
-                  <Link
-                    to={user ? '#' : '/login'}
+                  </div>                  {/* CTA */}
+                  <button
+                    onClick={() => {
+                      if (plan.id === 'free') {
+                        navigate(user ? '/' : '/login')
+                      } else {
+                        navigate(user ? '/checkout' : '/login', {
+                          state: { planId: plan.id, billing },
+                        })
+                      }
+                    }}
                     style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
                       width: '100%', padding: '0.875rem 1rem', borderRadius: '0.875rem',
                       fontSize: '0.875rem', fontWeight: 600, marginBottom: '1.75rem',
-                      textDecoration: 'none', transition: 'all 0.2s',
+                      textDecoration: 'none', transition: 'all 0.2s', border: 'none', cursor: 'pointer',
                       ...(plan.id === 'standard'
                         ? { background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', color: '#fff', boxShadow: '0 8px 24px rgba(14,165,233,0.35)' }
                         : plan.id === 'premium'
@@ -296,7 +303,7 @@ export default function Pricing() {
                   >
                     {plan.cta}
                     <ArrowRight style={{ width: '0.9rem', height: '0.9rem' }} />
-                  </Link>
+                  </button>
 
                   {/* Divider */}
                   <div style={{ height: '1px', background: 'rgba(51,65,85,0.4)', marginBottom: '1.5rem' }} />                  {/* Features */}
@@ -417,15 +424,15 @@ export default function Pricing() {
             </h2>
             <p style={{ color: '#64748b', marginBottom: '2.5rem', maxWidth: '420px', margin: '0 auto 2.5rem', lineHeight: 1.65 }}>
               Join 50,000+ users who trust MediMind AI for smarter health decisions every day.
-            </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.875rem', justifyContent: 'center' }}>
-              <Link to="/login"
-                style={{ padding: '0.9rem 2rem', borderRadius: '0.875rem', fontWeight: 600, fontSize: '0.9rem', color: '#fff', textDecoration: 'none', background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', boxShadow: '0 8px 28px rgba(14,165,233,0.35)', transition: 'all 0.2s' }}
+            </p>            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.875rem', justifyContent: 'center' }}>
+              <button
+                onClick={() => navigate(user ? '/' : '/login')}
+                style={{ padding: '0.9rem 2rem', borderRadius: '0.875rem', fontWeight: 600, fontSize: '0.9rem', color: '#fff', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', boxShadow: '0 8px 28px rgba(14,165,233,0.35)', transition: 'all 0.2s' }}
                 onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.03)'; e.currentTarget.style.filter = 'brightness(1.1)' }}
                 onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)';    e.currentTarget.style.filter = 'brightness(1)' }}
               >
                 Get Started Free
-              </Link>
+              </button>
               <Link to="/"
                 style={{ padding: '0.9rem 2rem', borderRadius: '0.875rem', fontWeight: 600, fontSize: '0.9rem', color: '#94a3b8', textDecoration: 'none', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', transition: 'all 0.2s' }}
                 onMouseEnter={e => { e.currentTarget.style.color = '#f1f5f9'; e.currentTarget.style.transform = 'scale(1.02)' }}
