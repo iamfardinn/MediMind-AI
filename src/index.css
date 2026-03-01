@@ -52,6 +52,15 @@ button {
   cursor: pointer;
   font-family: inherit;
 }
+
+/* Prevent the * reset from stripping input padding/sizing */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  box-sizing: border-box;
+}
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button { -webkit-appearance: none; }
 button:focus-visible {
   outline: 2px solid #0ea5e9;
   outline-offset: 2px;
