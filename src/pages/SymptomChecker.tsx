@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, AlertTriangle, CheckCircle, Info, Loader2, RotateCcw, Shield } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
-import { streamGeminiResponse } from '../services/gemini'
+import { streamGeminiResponse } from '../services/copilot'
 
 const BODY_SYSTEMS = [
   'Head & Neurological', 'Eyes & Vision', 'Ears, Nose & Throat',
@@ -104,19 +104,19 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
   }
 
   return (
-    <div style={{ maxWidth: '860px', margin: '0 auto', padding: '3.5rem 2.5rem 6rem 2.5rem' }}>
+    <div className="px-3 py-5 sm:px-6 sm:py-8 md:px-10" style={{ maxWidth: '860px', margin: '0 auto', paddingBottom: '5rem' }}>
 
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-11 h-11 rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-            <Shield className="w-5 h-5 text-white" />
+        <div className="flex items-center gap-2.5 mb-1.5">
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 flex items-center justify-center shrink-0">
+            <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">
             Symptom <span className="gradient-text">Analyzer</span>
           </h1>
         </div>
-        <p className="text-slate-400 text-sm" style={{ marginLeft: '3.25rem' }}>
+        <p className="text-slate-400 text-xs sm:text-sm" style={{ marginLeft: '3rem' }}>
           AI-powered symptom assessment — not a replacement for medical care
         </p>
       </motion.div>
@@ -127,7 +127,7 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className="glass rounded-2xl"
-        style={{ marginTop: '2.5rem', padding: '2.25rem', display: 'flex', flexDirection: 'column', gap: '1.75rem' }}
+        style={{ marginTop: '2rem', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
       >
         {/* Symptom description */}
         <div>
@@ -139,12 +139,12 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
             onChange={(e) => setSymptoms(e.target.value)}
             placeholder="e.g. I have a persistent headache, dizziness, and slight nausea for the past 2 days..."
             rows={3}
-            className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 text-sm outline-none focus:border-sky-500/50 transition-colors resize-none"
+            className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 text-white placeholder:text-slate-500 text-sm outline-none focus:border-sky-500/50 transition-colors resize-none"
           />
         </div>
 
         {/* Age / Severity / Duration */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Age</label>
             <input
@@ -152,12 +152,12 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
               value={age}
               onChange={(e) => setAge(e.target.value)}
               placeholder="e.g. 28"
-              className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white placeholder:text-slate-500 text-sm outline-none focus:border-sky-500/50 transition-colors"
+              className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-3 py-2.5 text-white placeholder:text-slate-500 text-sm outline-none focus:border-sky-500/50 transition-colors"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Severity</label>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5">
               {SEVERITY_OPTIONS.map(({ label, color }) => (
                 <button
                   key={label}
@@ -176,7 +176,7 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
             <select
               value={duration}
               onChange={(e) => setDuration(e.target.value)}
-              className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-sky-500/50 transition-colors"
+              className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-3 py-2.5 text-white text-sm outline-none focus:border-sky-500/50 transition-colors"
             >
               <option value="">Select duration</option>
               {DURATION_OPTIONS.map((d) => <option key={d} value={d}>{d}</option>)}
@@ -187,12 +187,12 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
         {/* Body System */}
         <div>
           <label className="block text-sm font-medium text-slate-300 mb-2">Body System (optional)</label>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {BODY_SYSTEMS.map((sys) => (
               <button
                 key={sys}
                 onClick={() => setSelectedSystem(selectedSystem === sys ? '' : sys)}
-                className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
+                className={`text-xs px-2.5 py-1.5 rounded-full border transition-all ${
                   selectedSystem === sys
                     ? 'bg-sky-500/20 border-sky-500/40 text-sky-300'
                     : 'border-slate-700/50 text-slate-400 hover:border-slate-600'
@@ -205,11 +205,11 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
         </div>
 
         {/* Actions */}
-        <div className="flex gap-3" style={{ paddingTop: '0.5rem' }}>
+        <div className="flex flex-wrap gap-3">
           <button
             onClick={handleAnalyze}
             disabled={!symptoms.trim() || loading}
-            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-linear-to-r from-sky-500 to-indigo-500 text-white font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:from-sky-400 hover:to-indigo-400 transition-all glow"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-linear-to-r from-sky-500 to-indigo-500 text-white font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:from-sky-400 hover:to-indigo-400 transition-all"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
             {loading ? 'Analyzing...' : 'Analyze Symptoms'}
@@ -217,7 +217,7 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
           {result && (
             <button
               onClick={handleReset}
-              className="flex items-center gap-2 px-4 py-3 rounded-xl border border-slate-700/50 text-slate-400 hover:text-white hover:border-slate-500 text-sm transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-700/50 text-slate-400 hover:text-white hover:border-slate-500 text-sm transition-all"
             >
               <RotateCcw className="w-4 h-4" />
               Reset
@@ -234,13 +234,13 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             className="glass rounded-2xl"
-            style={{ marginTop: '2.5rem', padding: '2.25rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
+            style={{ marginTop: '2rem', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}
           >
-            <div className="flex items-center justify-between flex-wrap gap-3">
-              <h2 className="text-lg font-semibold text-white">AI Analysis Result</h2>
+            <div className="flex items-start sm:items-center justify-between flex-wrap gap-2">
+              <h2 className="text-base sm:text-lg font-semibold text-white">AI Analysis Result</h2>
               <UrgencyBadge level={result.urgency} />
             </div>
-            <div className="prose prose-invert prose-sm max-w-none prose-headings:text-sky-300 prose-strong:text-white prose-li:text-slate-300 border-t border-slate-700/50 pt-4">
+            <div className="prose prose-invert prose-sm max-w-none prose-headings:text-sky-300 prose-strong:text-white prose-li:text-slate-300 border-t border-slate-700/50 pt-3">
               <ReactMarkdown>{result.text}</ReactMarkdown>
             </div>
             <p className="text-xs text-slate-500 border-t border-slate-700/50 pt-3">

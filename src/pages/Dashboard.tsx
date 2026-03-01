@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   LineChart, Line, AreaChart, Area, XAxis, YAxis,
@@ -5,7 +6,7 @@ import {
 } from 'recharts'
 import {
   Heart, Thermometer, Wind, Activity, TrendingUp,
-  Brain, Shield, Zap, ArrowUpRight, CalendarDays, Bell,
+  Brain, Shield, Zap, ArrowUpRight, CalendarDays,
   Users, UserCheck, UserPlus, Star, Crown, BadgeCheck, MoreHorizontal,
   TrendingDown, Minus
 } from 'lucide-react'
@@ -134,6 +135,185 @@ function StatCard({
   )
 }
 
+// ─── Trend Panel ──────────────────────────────────────────────────────────────
+
+const TABS = [
+  { key: 'heartRate',      label: 'Heart Rate',    unit: 'bpm',  color: '#f43f5e', gradFrom: '#f43f5e', gradTo: '#ec4899' },
+  { key: 'bloodPressure',  label: 'Blood Pressure',unit: 'mmHg', color: '#0ea5e9', gradFrom: '#0ea5e9', gradTo: '#6366f1' },
+  { key: 'temperature',    label: 'Temperature',   unit: '°F',   color: '#f59e0b', gradFrom: '#f59e0b', gradTo: '#f97316' },
+  { key: 'oxygenSat',      label: 'O₂ Saturation', unit: '%',    color: '#10b981', gradFrom: '#10b981', gradTo: '#14b8a6' },
+] as const
+
+type TabKey = typeof TABS[number]['key']
+
+type VitalEntry = {
+  date: string
+  heartRate: number
+  bloodPressureSys: number
+  bloodPressureDia: number
+  temperature: number
+  oxygenSat: number
+}
+
+function ChartTooltip({
+  active, payload, label, unit, accentColor,
+}: {
+  active?: boolean
+  payload?: { value: number; name: string; color: string }[]
+  label?: string
+  unit: string
+  accentColor: string
+}) {
+  if (!active || !payload?.length) return null
+  return (
+    <div style={{ background: 'rgba(15,23,42,0.95)', border: `1px solid ${accentColor}44`, borderRadius: '0.75rem', padding: '0.85rem 1.1rem', backdropFilter: 'blur(8px)' }}>
+      <p style={{ fontSize: '0.7rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: 500 }}>{label}</p>
+      {payload.map(p => (
+        <p key={p.name} style={{ fontSize: '0.88rem', color: p.color, fontWeight: 700 }}>
+          {p.value} <span style={{ fontWeight: 400, color: '#94a3b8', fontSize: '0.75rem' }}>{unit}</span>
+        </p>
+      ))}
+    </div>
+  )
+}
+
+function TrendPanel({ vitals }: { vitals: VitalEntry[]; latest: VitalEntry }) {
+  const [activeTab, setActiveTab] = useState<TabKey>('heartRate')
+  const tab = TABS.find(t => t.key === activeTab)!
+
+  /* Build chart data — for blood pressure we show both lines */
+  const chartData = vitals.map(v => ({
+    date:  v.date,
+    heartRate: v.heartRate,
+    sys:   v.bloodPressureSys,
+    dia:   v.bloodPressureDia,
+    temperature: v.temperature,
+    oxygenSat:   v.oxygenSat,
+  }))
+
+  /* Stat summary for active tab */
+  const values = vitals.map(v =>
+    activeTab === 'bloodPressure' ? v.bloodPressureSys : (v as never)[activeTab] as number
+  )
+  const minVal = Math.min(...values)
+  const maxVal = Math.max(...values)
+  const avgVal = Math.round(values.reduce((a, b) => a + b, 0) / values.length)
+
+  const isBP = activeTab === 'bloodPressure'
+  return (
+    <motion.div
+      {...fadeUp(0.1)}
+      className="rounded-3xl overflow-hidden"
+      style={{ background: 'linear-gradient(160deg, #131f35 0%, #0f172a 100%)', border: '1px solid rgba(51,65,85,0.5)' }}
+    >
+      {/* Tab bar */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0', borderBottom: '1px solid rgba(51,65,85,0.5)', padding: '0 1.5rem', overflowX: 'auto' }}>
+        {TABS.map(t => {
+          const isActive = t.key === activeTab
+          return (
+            <button
+              key={t.key}
+              onClick={() => setActiveTab(t.key)}
+              style={{
+                padding: '1.15rem 1.35rem',
+                fontSize: '0.8rem',
+                fontWeight: isActive ? 700 : 500,
+                color: isActive ? t.color : '#64748b',
+                borderBottom: isActive ? `2px solid ${t.color}` : '2px solid transparent',
+                background: 'transparent',
+                border: 'none',
+                borderBottomWidth: '2px',
+                borderBottomStyle: 'solid',
+                borderBottomColor: isActive ? t.color : 'transparent',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'color 0.2s',
+                flexShrink: 0,
+              }}
+            >
+              {t.label}
+            </button>
+          )
+        })}
+      </div>      {/* Body */}
+      <div className="p-4 sm:p-6 md:p-8" style={{ paddingBottom: '1.5rem' }}>
+        {/* Stat pills */}
+        <div className="flex flex-wrap items-center gap-3 mb-5">
+          {[
+            { label: 'Average', value: avgVal },
+            { label: 'Min',     value: minVal },
+            { label: 'Max',     value: maxVal },
+          ].map(s => (
+            <div key={s.label} style={{ background: `${tab.color}10`, border: `1px solid ${tab.color}25`, borderRadius: '0.875rem', padding: '0.6rem 1rem' }}>
+              <span style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' as const, display: 'block' }}>{s.label}</span>
+              <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>
+                {s.value} <span style={{ fontSize: '0.7rem', fontWeight: 400, color: '#94a3b8' }}>{tab.unit}</span>
+              </span>
+            </div>
+          ))}
+          <div className="ml-auto flex items-center gap-1.5">
+            <span style={{ width: '8px', height: '8px', borderRadius: '9999px', background: tab.color, display: 'inline-block', boxShadow: `0 0 6px ${tab.color}` }} />
+            <span style={{ fontSize: '0.7rem', color: '#64748b' }}>{vitals.length} entries</span>
+          </div>
+        </div>
+
+        {/* Chart */}
+        <div className="h-48 sm:h-64 md:h-72 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            {isBP ? (
+              <LineChart data={chartData} margin={{ top: 8, right: 16, left: -18, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="bpSys" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#0ea5e9" />
+                    <stop offset="100%" stopColor="#6366f1" />
+                  </linearGradient>
+                  <linearGradient id="bpDia" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#6366f1" />
+                    <stop offset="100%" stopColor="#a78bfa" />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(51,65,85,0.4)" vertical={false} />
+                <XAxis dataKey="date" tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} />                <Tooltip content={(props) => <ChartTooltip {...props} unit={tab.unit} accentColor={tab.color} />} />
+                <Legend wrapperStyle={{ fontSize: '0.75rem', color: '#94a3b8', paddingTop: '1rem' }} />
+                <Line type="monotone" dataKey="sys"name="Systolic" stroke="url(#bpSys)" strokeWidth={2.5} dot={false} activeDot={{ r: 5, fill: '#0ea5e9' }} />
+                <Line type="monotone" dataKey="dia" name="Diastolic" stroke="url(#bpDia)" strokeWidth={2} strokeDasharray="5 3" dot={false} activeDot={{ r: 5, fill: '#6366f1' }} />
+              </LineChart>
+            ) : (
+              <AreaChart data={chartData} margin={{ top: 8, right: 16, left: -18, bottom: 0 }}>
+                <defs>
+                  <linearGradient id={`grad-${activeTab}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stopColor={tab.color} stopOpacity={0.35} />
+                    <stop offset="100%" stopColor={tab.color} stopOpacity={0}    />
+                  </linearGradient>
+                  <linearGradient id={`line-${activeTab}`} x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%"   stopColor={tab.gradFrom} />
+                    <stop offset="100%" stopColor={tab.gradTo}   />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(51,65,85,0.4)" vertical={false} />
+                <XAxis dataKey="date" tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} />                <Tooltip content={(props) => <ChartTooltip {...props} unit={tab.unit} accentColor={tab.color} />} />
+                <Area
+                  type="monotone"
+                  dataKey={activeTab}
+                  stroke={`url(#line-${activeTab})`}
+                  strokeWidth={2.5}
+                  fill={`url(#grad-${activeTab})`}
+                  dot={false}
+                  activeDot={{ r: 5, fill: tab.color, stroke: 'transparent' }}
+                />
+              </AreaChart>
+            )}
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+// ─── Section Header ────────────────────────────────────────────────────────────
+
 function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div style={{ marginBottom: '1.75rem' }}>
@@ -149,45 +329,28 @@ export default function Dashboard() {
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
   return (
     <div style={{ width: '100%', minHeight: '100vh', backgroundColor: '#0f172a' }}>
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '3.5rem 3rem 7rem 3rem' }}>
-
-        {/* PAGE HEADER */}
+      <div className="px-4 py-8 sm:px-6 sm:py-10 md:px-10 lg:px-12" style={{ maxWidth: '1280px', margin: '0 auto', paddingBottom: '5rem' }}>        {/* PAGE HEADER */}
         <motion.div
-          {...fadeUp(0)}
-          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5"
+          {...fadeUp(0)}          className="flex flex-col items-center text-center gap-4"
+          style={{ marginTop: '1rem' }}
         >
-          <div>
-            <div className="flex items-center gap-2 text-slate-500 text-sm mb-2">
-              <CalendarDays className="w-4 h-4 shrink-0" />
-              <span>{today}</span>
-            </div>
-            <h1 className="text-3xl lg:text-4xl font-bold text-white leading-tight">
-              Health{' '}
-              <span className="bg-linear-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">
-                Dashboard
-              </span>
-            </h1>
-            <p className="text-slate-400 mt-2 text-sm lg:text-base">
-              Your real-time vitals and AI-powered health overview
-            </p>
+          <div className="flex items-center gap-2 text-slate-500 text-sm justify-center">
+            <CalendarDays className="w-4 h-4 shrink-0" />
+            <span>{today}</span>
           </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <button className="flex items-center gap-2.5 px-5 py-3 rounded-xl border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 text-base font-medium transition-all whitespace-nowrap">
-              <Bell className="w-5 h-5 shrink-0" />
-              Alerts
-            </button>
-            <Link
-              to="/chat"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-sm font-medium transition-all shadow-lg shadow-sky-500/20 whitespace-nowrap"
-            >
-              <Brain className="w-4 h-4 shrink-0" />
-              Ask AI
-            </Link>
-          </div>
-        </motion.div>        {/* VITALS GRID */}        <section style={{ marginTop: '5rem' }}>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
+            Health{' '}
+            <span className="bg-linear-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">
+              Dashboard
+            </span>
+          </h1>
+          <p className="text-slate-400 text-sm lg:text-base">
+            Your real-time vitals and AI-powered health overview
+          </p>
+        </motion.div>{/* VITALS GRID */}
+        <section style={{ marginTop: '3.5rem' }}>
           <SectionHeader title="Current Vitals" subtitle="Updated based on your latest recorded entry" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}
-               className="grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             <StatCard
               index={0} icon={Heart} label="Heart Rate"
               value={latest.heartRate} unit="bpm" sub="Normal"
@@ -212,91 +375,17 @@ export default function Dashboard() {
               gradientFrom="#10b981" gradientTo="#14b8a6"
               glowColor="#10b981" trend="up" trendValue="+1%" barPct={98}
             />
-          </div>
-        </section>{/* CHARTS */}
-        <section style={{ marginTop: '5rem' }}>
+          </div>        </section>
+
+        {/* CHARTS */}
+        <section style={{ marginTop: '3.5rem' }}>
           <SectionHeader title="Trends Over Time" subtitle="6-month historical health data" />
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-7 lg:gap-8">
+          <TrendPanel vitals={vitals} latest={latest} />        </section>
 
-            {/* Heart Rate */}
-            <motion.div {...fadeUp(0.15)} className="rounded-2xl bg-slate-800/60 border border-slate-700/50 p-5 lg:p-7 min-w-0">
-              <div className="flex items-center justify-between mb-6 gap-4">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-rose-500/15 flex items-center justify-center shrink-0">
-                    <Heart className="w-4 h-4 text-rose-400" />
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="text-sm font-semibold text-white">Heart Rate</h3>
-                    <p className="text-xs text-slate-500">beats per minute</p>
-                  </div>
-                </div>
-                <span className="text-xl font-bold text-white shrink-0">
-                  {latest.heartRate}
-                  <span className="text-xs font-normal text-slate-400 ml-1">bpm</span>
-                </span>
-              </div>
-              <ResponsiveContainer width="100%" height={200}>
-                <AreaChart data={vitals} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="heartGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.25} />
-                      <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                  <XAxis dataKey="date" stroke="transparent" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis stroke="transparent" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} domain={[60, 90]} />
-                  <Tooltip
-                    contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 10, padding: '8px 12px', fontSize: 12 }}
-                    labelStyle={{ color: '#94a3b8', marginBottom: 2 }}
-                    itemStyle={{ color: '#f43f5e' }}
-                  />
-                  <Area type="monotone" dataKey="heartRate" stroke="#f43f5e" strokeWidth={2} fill="url(#heartGrad)" dot={{ fill: '#f43f5e', r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </motion.div>
-
-            {/* Blood Pressure */}
-            <motion.div {...fadeUp(0.2)} className="rounded-2xl bg-slate-800/60 border border-slate-700/50 p-5 lg:p-7 min-w-0">
-              <div className="flex items-center justify-between mb-6 gap-4">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-sky-500/15 flex items-center justify-center shrink-0">
-                    <TrendingUp className="w-4 h-4 text-sky-400" />
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="text-sm font-semibold text-white">Blood Pressure</h3>
-                    <p className="text-xs text-slate-500">systolic / diastolic</p>
-                  </div>
-                </div>
-                <span className="text-xl font-bold text-white shrink-0">
-                  {latest.bloodPressureSys}/{latest.bloodPressureDia}
-                  <span className="text-xs font-normal text-slate-400 ml-1">mmHg</span>
-                </span>
-              </div>
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={vitals} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                  <XAxis dataKey="date" stroke="transparent" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis stroke="transparent" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} domain={[70, 140]} />
-                  <Tooltip
-                    contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 10, padding: '8px 12px', fontSize: 12 }}
-                    labelStyle={{ color: '#94a3b8', marginBottom: 2 }}
-                  />
-                  <Legend wrapperStyle={{ paddingTop: 12, fontSize: 11, color: '#94a3b8' }} />
-                  <Line type="monotone" dataKey="bloodPressureSys" stroke="#0ea5e9" strokeWidth={2} dot={{ fill: '#0ea5e9', r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} name="Systolic" />
-                  <Line type="monotone" dataKey="bloodPressureDia" stroke="#818cf8" strokeWidth={2} dot={{ fill: '#818cf8', r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} name="Diastolic" />
-                </LineChart>
-              </ResponsiveContainer>
-            </motion.div>
-          </div>
-        </section>        {/* AI TOOLS */}
-        <section style={{ marginTop: '5rem', paddingBottom: '2.5rem' }}>
-          <SectionHeader title="AI Tools" subtitle="Powered by Gemini 2.0 Flash — real-time intelligence" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.75rem' }}
-               className="grid-cols-1 md:grid-cols-3">
-
-            {/* ── Card 1: AI Medical Assistant ── */}
-            <motion.div
+        {/* AI TOOLS */}
+        <section style={{ marginTop: '3.5rem', paddingBottom: '1rem' }}>
+          <SectionHeader title="AI Tools" subtitle="Powered by GitHub Copilot — real-time intelligence" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">            {/* ── Card 1: AI Medical Assistant ── */}            <motion.div
               {...fadeUp(0.1)}
               className="relative overflow-hidden rounded-3xl flex flex-col"
               style={{ background: 'linear-gradient(145deg, #0c1a2e 0%, #0f172a 60%, #0c1929 100%)', border: '1px solid rgba(14,165,233,0.2)', padding: '2rem' }}
@@ -436,37 +525,33 @@ export default function Dashboard() {
               </Link>
             </motion.div>
 
-          </div>
-        </section>{/* CLIENTS */}
-        <section style={{ marginTop: '5rem' }}>
+          </div>        </section>
+
+        {/* CLIENTS */}
+        <section style={{ marginTop: '3.5rem' }}>
           <SectionHeader title="Clients" subtitle="Active patients and their current health plans" />
 
           {/* Client stat pills */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}
-               className="grid-cols-2 md:grid-cols-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5" style={{ marginBottom: '1.5rem' }}>
             {[
               { icon: Users,     label: 'Total Clients',  value: '1,284', change: '+12%', up: true,  iconBg: 'bg-sky-500/15',     iconColor: 'text-sky-400' },
               { icon: UserCheck, label: 'Active',         value: '1,047', change: '+8%',  up: true,  iconBg: 'bg-emerald-500/15', iconColor: 'text-emerald-400' },
               { icon: Crown,     label: 'Premium',        value: '386',   change: '+21%', up: true,  iconBg: 'bg-amber-500/15',   iconColor: 'text-amber-400' },
-              { icon: UserPlus,  label: 'New This Month', value: '57',    change: '-4%',  up: false, iconBg: 'bg-rose-500/15',    iconColor: 'text-rose-400' },
-            ].map(({ icon: Icon, label, value, change, up, iconBg, iconColor }, i) => (
+              { icon: UserPlus,  label: 'New This Month', value: '57',    change: '-4%',  up: false, iconBg: 'bg-rose-500/15',    iconColor: 'text-rose-400' },            ].map(({ icon: Icon, label, value, change, up, iconBg, iconColor }, i) => (
               <motion.div
                 key={label}
                 {...fadeUp(i * 0.07)}
-                className="rounded-2xl bg-slate-800/60 border border-slate-700/50"
-                style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}
+                className="rounded-2xl bg-slate-800/60 border border-slate-700/50 flex items-center gap-3 p-4 sm:p-6"
               >
-                <div className={`w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center shrink-0`}>
-                  <Icon className={`w-6 h-6 ${iconColor}`} />
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${iconBg} flex items-center justify-center shrink-0`}>
+                  <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${iconColor}`} />
                 </div>
-                <div className="min-w-0">
-                  <p className="text-2xl font-bold text-white leading-tight">{value}</p>
-                  <p className="text-xs text-slate-400 truncate" style={{ marginTop: '0.2rem' }}>{label}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xl sm:text-2xl font-bold text-white leading-tight">{value}</p>
+                  <p className="text-xs text-slate-400 truncate mt-0.5">{label}</p>
                 </div>
-                <span
-                  className={`text-xs font-semibold shrink-0 rounded-full ${up ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}`}
-                  style={{ marginLeft: 'auto', padding: '0.25rem 0.6rem' }}
-                >
+                <span className={`text-xs font-semibold shrink-0 rounded-full ${up ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}`}
+                      style={{ padding: '0.25rem 0.5rem' }}>
                   {change}
                 </span>
               </motion.div>
@@ -474,18 +559,21 @@ export default function Dashboard() {
           </div>
 
           {/* Client table */}
-          <motion.div {...fadeUp(0.15)} className="rounded-2xl bg-slate-800/60 border border-slate-700/50 overflow-hidden">
-            <div className="flex items-center justify-between border-b border-slate-700/50" style={{ padding: '1.25rem 1.75rem' }}>
+          <motion.div {...fadeUp(0.15)} className="rounded-2xl bg-slate-800/60 border border-slate-700/50 overflow-hidden">            <div className="flex items-center justify-between border-b border-slate-700/50 px-4 py-3 sm:px-6 sm:py-4">
               <h3 className="text-sm font-semibold text-white">Recent Clients</h3>
               <button className="text-xs text-sky-400 hover:text-sky-300 transition-colors">View All</button>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-sm min-w-[520px]">
                 <thead>
                   <tr className="text-xs text-slate-500 uppercase tracking-wider border-b border-slate-700/30">
-                    {['Client', 'Age', 'Condition', 'Plan', 'Last Visit', 'Status', ''].map((h, i) => (
-                      <th key={i} className={`font-medium ${h ? 'text-left' : ''}`} style={{ padding: '1rem 1.75rem' }}>{h}</th>
-                    ))}
+                    <th className="font-medium text-left px-4 py-3 sm:px-6">Client</th>
+                    <th className="font-medium text-left px-4 py-3 sm:px-6 hidden sm:table-cell">Age</th>
+                    <th className="font-medium text-left px-4 py-3 sm:px-6">Condition</th>
+                    <th className="font-medium text-left px-4 py-3 sm:px-6 hidden md:table-cell">Plan</th>
+                    <th className="font-medium text-left px-4 py-3 sm:px-6 hidden lg:table-cell">Last Visit</th>
+                    <th className="font-medium text-left px-4 py-3 sm:px-6">Status</th>
+                    <th className="px-4 py-3 sm:px-6"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -495,17 +583,17 @@ export default function Dashboard() {
                       {...fadeUp(0.1 + i * 0.05)}
                       className="border-b border-slate-700/20 last:border-0 hover:bg-slate-700/20 transition-colors"
                     >
-                      <td style={{ padding: '1.1rem 1.75rem' }}>
-                        <div className="flex items-center gap-3">
-                          <div className={`w-9 h-9 rounded-full ${c.avatarColor} flex items-center justify-center text-white text-xs font-bold shrink-0`}>
+                      <td className="px-4 py-3 sm:px-6 sm:py-4">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full ${c.avatarColor} flex items-center justify-center text-white text-xs font-bold shrink-0`}>
                             {c.avatar}
                           </div>
-                          <span className="text-white font-medium whitespace-nowrap">{c.name}</span>
+                          <span className="text-white font-medium whitespace-nowrap text-xs sm:text-sm">{c.name}</span>
                         </div>
                       </td>
-                      <td style={{ padding: '1.1rem 1.75rem' }} className="text-slate-400">{c.age}</td>
-                      <td style={{ padding: '1.1rem 1.75rem' }} className="text-slate-300">{c.condition}</td>
-                      <td style={{ padding: '1.1rem 1.75rem' }}>
+                      <td className="px-4 py-3 sm:px-6 sm:py-4 text-slate-400 text-xs sm:text-sm hidden sm:table-cell">{c.age}</td>
+                      <td className="px-4 py-3 sm:px-6 sm:py-4 text-slate-300 text-xs sm:text-sm">{c.condition}</td>
+                      <td className="px-4 py-3 sm:px-6 sm:py-4 hidden md:table-cell">
                         {c.plan === 'Premium' ? (
                           <span className="flex items-center gap-1 text-amber-400 text-xs font-medium">
                             <Crown className="w-3 h-3" /> Premium
@@ -514,17 +602,15 @@ export default function Dashboard() {
                           <span className="text-slate-400 text-xs">Standard</span>
                         )}
                       </td>
-                      <td style={{ padding: '1.1rem 1.75rem' }} className="text-slate-400 whitespace-nowrap">{c.lastVisit}</td>
-                      <td style={{ padding: '1.1rem 1.75rem' }}>
-                        <span className={`text-xs font-medium rounded-full ${
+                      <td className="px-4 py-3 sm:px-6 sm:py-4 text-slate-400 text-xs whitespace-nowrap hidden lg:table-cell">{c.lastVisit}</td>
+                      <td className="px-4 py-3 sm:px-6 sm:py-4">
+                        <span className={`text-xs font-medium rounded-full px-2 py-1 ${
                           c.status === 'Active' ? 'bg-emerald-500/15 text-emerald-400' :
-                          c.status === 'Review' ? 'bg-amber-500/15 text-amber-400'    :
+                          c.status === 'Review' ? 'bg-amber-500/15 text-amber-400' :
                                                   'bg-slate-700/60 text-slate-400'
-                        }`} style={{ padding: '0.3rem 0.75rem' }}>
-                          {c.status}
-                        </span>
+                        }`}>{c.status}</span>
                       </td>
-                      <td style={{ padding: '1.1rem 1.75rem' }}>
+                      <td className="px-4 py-3 sm:px-6 sm:py-4">
                         <button className="text-slate-500 hover:text-slate-300 transition-colors">
                           <MoreHorizontal className="w-4 h-4" />
                         </button>
@@ -535,21 +621,16 @@ export default function Dashboard() {
               </table>
             </div>
           </motion.div>
-        </section>
-
-        {/* PREMIUM REVIEWS */}
-        <section style={{ marginTop: '5rem', paddingBottom: '2rem' }}>
+        </section>        {/* PREMIUM REVIEWS */}
+        <section style={{ marginTop: '3.5rem', paddingBottom: '2rem' }}>
           <SectionHeader title="Premium Client Reviews" subtitle="What our top-tier members are saying" />
 
           {/* Review cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.75rem' }}
-               className="grid-cols-1 md:grid-cols-3">
-            {REVIEWS.map((r, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">            {REVIEWS.map((r, i) => (
               <motion.div
                 key={r.name}
                 {...fadeUp(0.1 + i * 0.08)}
-                className="rounded-2xl bg-slate-800/60 border border-slate-700/50 flex flex-col hover:border-slate-600 transition-colors"
-                style={{ padding: '2rem' }}
+                className="rounded-2xl bg-slate-800/60 border border-slate-700/50 flex flex-col hover:border-slate-600 transition-colors p-5 sm:p-8"
               >
                 {/* Stars */}
                 <div className="flex items-center gap-1">
@@ -579,27 +660,25 @@ export default function Dashboard() {
                 </div>
               </motion.div>
             ))}
-          </div>
-
-          {/* Overall rating summary */}
+          </div>          {/* Overall rating summary */}
           <motion.div
             {...fadeUp(0.3)}
-            className="rounded-2xl bg-slate-800/60 border border-slate-700/50 flex flex-col md:flex-row items-center"
-            style={{ marginTop: '2rem', padding: '2.5rem', gap: '3rem' }}
+            className="rounded-2xl bg-slate-800/60 border border-slate-700/50 flex flex-col md:flex-row items-center gap-6 md:gap-10 p-6 sm:p-8"
+            style={{ marginTop: '1.5rem' }}
           >
             {/* Score */}
             <div className="text-center shrink-0">
-              <p className="text-6xl font-bold text-white">4.9</p>
-              <div className="flex items-center justify-center gap-1" style={{ marginTop: '0.5rem' }}>
+              <p className="text-5xl sm:text-6xl font-bold text-white">4.9</p>
+              <div className="flex items-center justify-center gap-1 mt-1.5">
                 {Array.from({ length: 5 }).map((_, s) => (
                   <Star key={s} className="w-4 h-4 text-amber-400 fill-amber-400" />
                 ))}
               </div>
-              <p className="text-slate-500 text-xs" style={{ marginTop: '0.4rem' }}>Based on 386 reviews</p>
+              <p className="text-slate-500 text-xs mt-1">Based on 386 reviews</p>
             </div>
 
             {/* Bars */}
-            <div className="flex-1 w-full" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+            <div className="flex-1 w-full flex flex-col gap-2.5">
               {[
                 { label: '5 stars', pct: 78 },
                 { label: '4 stars', pct: 16 },
@@ -607,8 +686,8 @@ export default function Dashboard() {
                 { label: '2 stars', pct: 1  },
                 { label: '1 star',  pct: 1  },
               ].map(({ label, pct }) => (
-                <div key={label} className="flex items-center" style={{ gap: '0.75rem' }}>
-                  <span className="text-xs text-slate-400 shrink-0" style={{ width: '3.5rem' }}>{label}</span>
+                <div key={label} className="flex items-center gap-3">
+                  <span className="text-xs text-slate-400 shrink-0 w-12">{label}</span>
                   <div className="flex-1 h-2 bg-slate-700/60 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
@@ -617,18 +696,18 @@ export default function Dashboard() {
                       className="h-full bg-amber-400 rounded-full"
                     />
                   </div>
-                  <span className="text-xs text-slate-400 shrink-0 text-right" style={{ width: '2.5rem' }}>{pct}%</span>
+                  <span className="text-xs text-slate-400 shrink-0 w-8 text-right">{pct}%</span>
                 </div>
               ))}
             </div>
 
             {/* Verified badge */}
-            <div className="flex flex-col items-center shrink-0" style={{ gap: '0.75rem' }}>
+            <div className="flex flex-col items-center gap-2 shrink-0">
               <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
                 <BadgeCheck className="w-5 h-5" />
                 Verified Reviews
               </div>
-              <p className="text-slate-500 text-xs text-center" style={{ maxWidth: '9rem' }}>
+              <p className="text-slate-500 text-xs text-center max-w-[8rem]">
                 All reviews from active premium members
               </p>
             </div>

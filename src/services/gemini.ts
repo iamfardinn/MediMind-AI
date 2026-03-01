@@ -24,23 +24,13 @@ export async function streamGeminiResponse(
 ) {
   try {
     if (!API_KEY) {
-      // Demo mode - simulate streaming
-      const demoResponse = getDemoResponse(userMessage)
-      let i = 0
-      const interval = setInterval(() => {
-        if (i < demoResponse.length) {
-          onChunk(demoResponse.slice(i, i + 3))
-          i += 3
-        } else {
-          clearInterval(interval)
-          onDone()
-        }
-      }, 20)
+      onError('No API key found. Please add VITE_GEMINI_API_KEY to your .env file. Get a free key at https://aistudio.google.com/app/apikey')
+      onDone()
       return
     }
 
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-1.5-flash',
       systemInstruction: SYSTEM_PROMPT,
     })
 
@@ -54,21 +44,15 @@ export async function streamGeminiResponse(
     onDone()
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error occurred'
-    onError(message)
+
+    if (message.includes('429') || message.toLowerCase().includes('quota')) {
+      const retryMatch = message.match(/retry in (\d+)/)
+      const secs = retryMatch ? retryMatch[1] : '60'
+      onError(`⏳ Rate limit reached — please wait **${secs} seconds** and try again.\n\nThe free tier has limited requests per minute. You can upgrade at https://ai.google.dev/pricing`)
+    } else {
+      onError(message)
+    }
+
     onDone()
   }
-}
-
-function getDemoResponse(input: string): string {
-  const lower = input.toLowerCase()
-  if (lower.includes('headache')) {
-    return `## Headache Assessment 🧠\n\nI understand you're experiencing a headache. Here's what I can help with:\n\n**Possible Causes:**\n- Tension headache (most common)\n- Dehydration\n- Eye strain\n- Stress or anxiety\n- Lack of sleep\n\n**Immediate Relief Tips:**\n- Drink a full glass of water\n- Rest in a dark, quiet room\n- Apply a cold or warm compress\n- Take OTC pain relievers (ibuprofen/acetaminophen) if needed\n\n**⚠️ See a doctor if:**\n- Pain is sudden and severe ("thunderclap")\n- Accompanied by fever, stiff neck, or confusion\n- Doesn't improve with medication\n\n*I'm an AI assistant — always consult a healthcare professional for persistent symptoms.*`
-  }
-  if (lower.includes('fever')) {
-    return `## Fever Guidance 🌡️\n\nA fever is your body's natural response to infection.\n\n**Normal vs. Concerning:**\n- 99-100.4°F: Low-grade, monitor closely\n- 100.4-103°F: Moderate, treat symptoms\n- 103°F+: High, seek medical attention\n\n**Management:**\n- Stay hydrated — drink plenty of fluids\n- Rest and avoid strenuous activity\n- Use fever reducers (acetaminophen/ibuprofen)\n- Wear light clothing\n\n**🚨 Emergency Signs:**\n- Fever above 104°F\n- Difficulty breathing\n- Severe headache or rash\n- Confusion or seizures\n\n*Please consult a doctor if fever persists beyond 2-3 days.*`
-  }
-  if (lower.includes('chest pain')) {
-    return `## ⚠️ CHEST PAIN — URGENT NOTICE\n\n**If this is severe, sudden, or crushing chest pain — CALL 911 IMMEDIATELY.**\n\nChest pain can have many causes:\n\n**Cardiac (Emergency):**\n- Heart attack — crushing pain, radiating to arm/jaw\n- Call 911, chew aspirin if not allergic\n\n**Non-Cardiac:**\n- Acid reflux / GERD\n- Muscle strain\n- Anxiety / panic attack\n- Costochondritis\n\n**Please seek immediate medical evaluation for any chest pain.**\n\n*This is not a situation to manage at home without professional assessment.*`
-  }
-  return `## MediMind AI Response 🏥\n\nThank you for sharing that with me. Based on what you've described, here are my thoughts:\n\n**General Advice:**\n- Monitor your symptoms closely\n- Stay hydrated and get adequate rest\n- Maintain a healthy diet\n- Track any changes in your condition\n\n**When to Seek Care:**\n- If symptoms worsen or persist beyond 48 hours\n- If you develop additional concerning symptoms\n- If you're unsure about anything health-related\n\n**Wellness Tips:**\n- Regular exercise (30 min/day)\n- 7-9 hours of sleep\n- Balanced nutrition\n- Stress management\n\n*Remember: I'm an AI assistant and cannot replace professional medical advice. Please consult a qualified healthcare provider for proper diagnosis and treatment.*`
 }

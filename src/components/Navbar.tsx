@@ -28,10 +28,8 @@ export default function Navbar() {
             <Brain className="w-4 h-4 text-white" />
           </div>
           <span className="text-lg font-bold gradient-text whitespace-nowrap">MediMind AI</span>
-        </Link>
-
-        {/* Desktop Nav — centered */}
-        <div className="hidden md:flex items-center gap-1">
+        </Link>        {/* Desktop Nav — centered */}
+        <div className="hidden md:flex items-center gap-6">
           {navItems.map(({ path, label, icon: Icon }) => {
             const active = location.pathname === path
             return (
