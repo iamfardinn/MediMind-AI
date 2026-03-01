@@ -55,8 +55,31 @@ app.get('/', (req, res) => {
     status: 'ok',
     service: 'MediMind Payment API',
     stripe: !!stripe,
-    sslcommerz: sslEnabled,
-  })
+    sslcommerz: sslEnabled,  })
+})
+
+// ═════════════════════════════════════════════════════════════════════════════
+// USER PLAN
+// ═════════════════════════════════════════════════════════════════════════════
+
+app.get('/api/user/plan/:userId', async (req, res) => {
+  try {
+    const plan = await db.getUserPlan(req.params.userId)
+    res.json(plan)
+  } catch (err) {
+    console.error('[API] getUserPlan error:', err.message)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.get('/api/user/payments/:userId', async (req, res) => {
+  try {
+    const payments = await db.getPaymentsByUser(req.params.userId)
+    res.json(payments)
+  } catch (err) {
+    console.error('[API] getPaymentsByUser error:', err.message)
+    res.status(500).json({ error: err.message })
+  }
 })
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -234,6 +257,32 @@ app.post('/api/payments/sslcommerz/ipn', async (req, res) => {
   } catch (err) {
     console.error('❌ [SSLCommerz] IPN error:', err.message)
     res.sendStatus(200)
+  }
+})
+
+// ═════════════════════════════════════════════════════════════════════════════
+// USER PLAN & PAYMENT HISTORY
+// ═════════════════════════════════════════════════════════════════════════════
+
+// Get user's active plan
+app.get('/api/user/plan/:userId', async (req, res) => {
+  try {
+    const plan = await db.getUserPlan(req.params.userId)
+    res.json(plan)
+  } catch (err) {
+    console.error('❌ [User Plan] error:', err.message)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// Get user's payment history
+app.get('/api/user/payments/:userId', async (req, res) => {
+  try {
+    const payments = await db.getPaymentsByUser(req.params.userId)
+    res.json(payments)
+  } catch (err) {
+    console.error('❌ [Payments] error:', err.message)
+    res.status(500).json({ error: err.message })
   }
 })
 

@@ -19,6 +19,7 @@ import {
   PLAN_PRICES, PLAN_LABELS,
   type PlanId, type Billing, type Gateway, type OrderPayload,
 } from '../services/payment'
+import { saveUserPlan } from '../services/userPlan'
 
 // ── Stripe element appearance ─────────────────────────────────────────────────
 const STRIPE_STYLE = {
@@ -259,10 +260,20 @@ export default function Checkout() {
   const planId   = state.planId  ?? 'standard'
   const billing  = state.billing ?? 'monthly'
   const price    = PLAN_PRICES[planId][billing]
-
   const [gateway,  setGateway]  = useState<Gateway>('stripe')
   const [error,    setError]    = useState('')
   const [success,  setSuccess]  = useState(false)
+  // Save plan to Firestore + mark success
+  const handlePaymentSuccess = async () => {
+    try {
+      if (user) {
+        await saveUserPlan(user.uid, planId as 'standard' | 'premium', billing)
+      }
+    } catch (err) {
+      console.warn('Firestore plan save failed (non-blocking):', err)
+    }
+    setSuccess(true)
+  }
 
   // Must be logged in
   if (!user) {
@@ -443,7 +454,7 @@ export default function Checkout() {
                       <Elements stripe={stripePromise}>
                         <StripeForm
                           payload={payload}
-                          onSuccess={() => setSuccess(true)}
+                          onSuccess={handlePaymentSuccess}
                           onError={setError}
                         />
                       </Elements>

@@ -1,10 +1,12 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, Activity, MessageSquare, LayoutDashboard, Menu, X, LogOut, CreditCard } from 'lucide-react'
+import { Brain, Activity, MessageSquare, LayoutDashboard, Menu, X, LogOut, CreditCard, PanelRight } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import { useState, useRef, useEffect } from 'react'
 import { signOut } from 'firebase/auth'
 import { auth } from '../services/firebase'
 import { useAuthStore } from '../store/useAuthStore'
+import { useUserPlan } from '../hooks/useUserPlan'
+import UserSidePanel from './UserSidePanel'
 
 const navItems = [
   { path: '/',        label: 'Home',          icon: LayoutDashboard },
@@ -16,8 +18,10 @@ const navItems = [
 export default function Navbar() {
   const location = useLocation()
   const { user, logout } = useAuthStore()
+  const { plan } = useUserPlan()
   const [menuOpen, setMenuOpen] = useState(false)
   const [dropOpen, setDropOpen] = useState(false)
+  const [panelOpen, setPanelOpen] = useState(false)
   const dropRef = useRef<HTMLDivElement>(null)
 
   // Close dropdown on outside click
@@ -38,8 +42,8 @@ export default function Navbar() {
   const initials = user?.displayName
     ? user.displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : user?.email?.[0].toUpperCase() ?? '?'
-
   return (
+    <>
     <motion.nav
       initial={{ y: -60, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
@@ -159,11 +163,26 @@ export default function Navbar() {
                         <p className="text-xs text-slate-400 truncate">{user.email}</p>
                         <div className="flex items-center gap-1.5 mt-0.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                          <span className="text-[10px] text-emerald-400 font-medium tracking-wide">Active • Standard Plan</span>
+                          <span className="text-[10px] text-emerald-400 font-medium tracking-wide">
+                            Active • {plan.planId === 'premium' ? 'Premium' : plan.planId === 'standard' ? 'Standard' : 'Free'} Plan
+                          </span>
                         </div>
                       </div>
                     </div>                    {/* Sign out button */}
                     <div className="px-3 py-3">
+                      <button
+                        onClick={() => { setPanelOpen(true); setDropOpen(false) }}
+                        className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 mb-1"
+                        style={{ color: '#38bdf8' }}
+                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(14,165,233,0.08)')}
+                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                      >
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                             style={{ background: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.2)' }}>
+                          <PanelRight className="w-3.5 h-3.5" />
+                        </div>
+                        My Dashboard
+                      </button>
                       <button
                         onClick={handleLogout}
                         className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200"
@@ -243,9 +262,11 @@ export default function Navbar() {
                 </button>
               </div>
             )}
-          </div>
-        </motion.div>
-      )}
-    </motion.nav>
+          </div>        </motion.div>
+      )}    </motion.nav>
+
+    {/* User Side Panel — rendered outside nav to avoid backdrop-filter containment */}
+    <UserSidePanel open={panelOpen} onClose={() => setPanelOpen(false)} />
+    </>
   )
 }

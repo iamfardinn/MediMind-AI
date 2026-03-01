@@ -98,9 +98,42 @@ async function upsertUserPlan(userId, userEmail, planId, billing) {
             active     = TRUE,
             updated_at = NOW()
     `, [userId, userEmail, planId, billing])
-  } catch (err) {
-    console.error('[DB] upsertUserPlan error:', err.message)
+  } catch (err) {    console.error('[DB] upsertUserPlan error:', err.message)
   }
 }
 
-module.exports = { pool, initDb, insertPayment, updatePaymentStatus, upsertUserPlan }
+async function getUserPlan(userId) {
+  try {
+    const result = await pool.query(
+      `SELECT plan_id, billing, active, started_at, updated_at FROM user_plans WHERE user_id = $1`,
+      [userId]
+    )
+    if (result.rows.length === 0) return { planId: 'free', billing: 'monthly', active: true }
+    const row = result.rows[0]
+    return {
+      planId:    row.plan_id,
+      billing:   row.billing,
+      active:    row.active,
+      startedAt: row.started_at,
+      updatedAt: row.updated_at,
+    }
+  } catch (err) {
+    console.error('[DB] getUserPlan error:', err.message)
+    return { planId: 'free', billing: 'monthly', active: true }
+  }
+}
+
+async function getPaymentsByUser(userId) {
+  try {
+    const result = await pool.query(
+      `SELECT * FROM payments WHERE user_id = $1 ORDER BY created_at DESC LIMIT 20`,
+      [userId]
+    )
+    return result.rows
+  } catch (err) {
+    console.error('[DB] getPaymentsByUser error:', err.message)
+    return []
+  }
+}
+
+module.exports = { pool, initDb, insertPayment, updatePaymentStatus, upsertUserPlan, getUserPlan, getPaymentsByUser }
