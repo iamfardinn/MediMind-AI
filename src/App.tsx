@@ -7,6 +7,9 @@ import Chat from './pages/Chat'
 import SymptomChecker from './pages/SymptomChecker'
 import Pricing from './pages/Pricing'
 import Checkout from './pages/Checkout'
+import PaymentSuccess from './pages/PaymentSuccess'
+import PaymentFail from './pages/PaymentFail'
+import PaymentCancel from './pages/PaymentCancel'
 import Login from './pages/Login'
 import './App.css'
 
@@ -39,11 +42,14 @@ function App() {
               <Navbar />
               <main className="w-full">
                 <Routes>
-                  <Route path="/"         element={<Dashboard />} />
-                  <Route path="/chat"     element={<Chat />} />
-                  <Route path="/symptoms" element={<SymptomChecker />} />
-                  <Route path="/pricing"  element={<Pricing />} />
-                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/"                  element={<Dashboard />} />
+                  <Route path="/chat"              element={<Chat />} />
+                  <Route path="/symptoms"          element={<SymptomChecker />} />
+                  <Route path="/pricing"           element={<Pricing />} />
+                  <Route path="/checkout"          element={<Checkout />} />
+                  <Route path="/payment/success"   element={<PaymentSuccess />} />
+                  <Route path="/payment/fail"      element={<PaymentFail />} />
+                  <Route path="/payment/cancel"    element={<PaymentCancel />} />
                 </Routes>
               </main>
             </>
