@@ -63,10 +63,10 @@ export default function Login() {
         const cred = await createUserWithEmailAndPassword(auth, email, password)
         if (name) await updateProfile(cred.user, { displayName: name })
         await saveUserToFirestore(cred.user.uid, cred.user.email, name || cred.user.displayName, cred.user.photoURL)
-        setUser({ uid: cred.user.uid, email: cred.user.email, displayName: name || null, photoURL: null })
+        setUser({ uid: cred.user.uid, email: cred.user.email, displayName: name || null, photoURL: null, createdAt: cred.user.metadata.creationTime ?? null })
       } else {
         const cred = await signInWithEmailAndPassword(auth, email, password)
-        setUser({ uid: cred.user.uid, email: cred.user.email, displayName: cred.user.displayName, photoURL: cred.user.photoURL })
+        setUser({ uid: cred.user.uid, email: cred.user.email, displayName: cred.user.displayName, photoURL: cred.user.photoURL, createdAt: cred.user.metadata.creationTime ?? null })
       }
       navigate('/', { replace: true })
     } catch (err: unknown) {
@@ -93,7 +93,7 @@ export default function Login() {
     try {
       const cred = await signInWithPopup(auth, googleProvider)
       await saveUserToFirestore(cred.user.uid, cred.user.email, cred.user.displayName, cred.user.photoURL)
-      setUser({ uid: cred.user.uid, email: cred.user.email, displayName: cred.user.displayName, photoURL: cred.user.photoURL })
+      setUser({ uid: cred.user.uid, email: cred.user.email, displayName: cred.user.displayName, photoURL: cred.user.photoURL, createdAt: cred.user.metadata.creationTime ?? null })
       navigate('/', { replace: true })
     } catch (err: unknown) {
       console.error('[Google error]', err)

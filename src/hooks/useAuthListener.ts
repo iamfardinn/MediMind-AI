@@ -10,12 +10,12 @@ export function useAuthListener() {
   useEffect(() => {
     setLoading(true)
     const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        setUser({
+      if (firebaseUser) {        setUser({
           uid:         firebaseUser.uid,
           email:       firebaseUser.email,
           displayName: firebaseUser.displayName,
           photoURL:    firebaseUser.photoURL,
+          createdAt:   firebaseUser.metadata.creationTime ?? null,
         })
       } else {
         setUser(null)
