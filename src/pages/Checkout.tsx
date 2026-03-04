@@ -14,12 +14,12 @@ import {
   CreditCard, Smartphone, Loader2, AlertCircle, Crown, Zap,
 } from 'lucide-react'
 import { useAuthStore } from '../store/useAuthStore'
+import { saveUserPlan } from '../services/userPlan'
 import {
   stripePromise, createStripeIntent, initSSLCommerz,
   PLAN_PRICES, PLAN_LABELS,
   type PlanId, type Billing, type Gateway, type OrderPayload,
 } from '../services/payment'
-import { saveUserPlan } from '../services/userPlan'
 
 // ── Stripe element appearance ─────────────────────────────────────────────────
 const STRIPE_STYLE = {
@@ -217,34 +217,181 @@ function SSLCommerzForm({
   )
 }
 
-// ── Success screen ────────────────────────────────────────────────────────────
-function SuccessScreen({ plan, billing }: { plan: PlanId; billing: Billing }) {
+// ── Pre-computed particle data (avoids Math.random during render) ─────────────
+const PARTICLES = Array.from({ length: 12 }, (_, i) => ({
+  yEnd: -120 - (((i * 7 + 3) * 13) % 160),
+  xEnd: (((i * 11 + 5) % 300) - 150),
+  dur: 1.8 + ((i * 7) % 12) / 10,
+  w: 6 + ((i * 3 + 2) % 8),
+  h: 6 + ((i * 5 + 1) % 8),
+  round: i % 2 === 0,
+  color: ['#34d399', '#0ea5e9', '#f59e0b', '#a855f7', '#f43f5e', '#6366f1'][i % 6],
+}))
+
+// ── Success popup overlay ─────────────────────────────────────────────────────
+function SuccessPopup({ plan, billing, onClose }: { plan: PlanId; billing: Billing; onClose: () => void }) {
   const navigate = useNavigate()
+
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.92 }}
-      animate={{ opacity: 1, scale: 1 }}
-      style={{ textAlign: 'center', padding: '3rem 2rem' }}
-    >
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(12px)',
+        padding: '1.5rem',
+      }}
+      onClick={onClose}
+    >      {/* Floating particles */}
+      {PARTICLES.map((p, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 0, x: 0, scale: 0 }}
+          animate={{
+            opacity: [0, 1, 0],
+            y: [0, p.yEnd],
+            x: [p.xEnd],
+            scale: [0, 1, 0.5],
+          }}
+          transition={{ duration: p.dur, delay: 0.2 + i * 0.08, ease: 'easeOut' }}
+          style={{
+            position: 'absolute',
+            width: `${p.w}px`,
+            height: `${p.h}px`,
+            borderRadius: p.round ? '50%' : '2px',
+            background: p.color,
+            pointerEvents: 'none',
+          }}
+        />
+      ))}
+
       <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
-        style={{ width: '5rem', height: '5rem', borderRadius: '50%', background: 'rgba(16,185,129,0.15)', border: '2px solid rgba(16,185,129,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}
+        initial={{ opacity: 0, scale: 0.75, y: 40 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.8, y: 30 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 22, delay: 0.05 }}
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: '100%', maxWidth: '440px',
+          borderRadius: '1.5rem', overflow: 'hidden',
+          background: 'linear-gradient(160deg, #131f35 0%, #0f172a 100%)',
+          border: '1px solid rgba(52,211,153,0.25)',
+          boxShadow: '0 32px 80px rgba(0,0,0,0.6), 0 0 60px rgba(52,211,153,0.08)',
+          textAlign: 'center',
+        }}
       >
-        <CheckCircle style={{ width: '2.5rem', height: '2.5rem', color: '#34d399' }} />
+        {/* Top gradient bar */}
+        <div style={{ height: '4px', background: 'linear-gradient(90deg, #34d399, #0ea5e9, #6366f1)' }} />
+
+        <div style={{ padding: '2.5rem 2rem 2rem' }}>
+          {/* Animated check icon */}
+          <motion.div
+            initial={{ scale: 0, rotate: -45 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 18, delay: 0.2 }}
+            style={{
+              width: '5rem', height: '5rem', borderRadius: '50%',
+              background: 'rgba(16,185,129,0.12)', border: '2px solid rgba(52,211,153,0.35)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 1.5rem',
+              boxShadow: '0 0 40px rgba(52,211,153,0.15)',
+            }}
+          >
+            <motion.div
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ delay: 0.4, duration: 0.4 }}
+            >
+              <CheckCircle style={{ width: '2.5rem', height: '2.5rem', color: '#34d399' }} />
+            </motion.div>
+          </motion.div>
+
+          {/* Title */}
+          <motion.h2
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f8fafc', marginBottom: '0.5rem' }}
+          >
+            🎉 Plan Purchased!
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            style={{ color: '#94a3b8', fontSize: '0.95rem', marginBottom: '0.25rem' }}
+          >
+            You're now on the
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+              padding: '0.5rem 1.25rem', borderRadius: '999px', marginBottom: '1rem',
+              background: plan === 'premium'
+                ? 'linear-gradient(135deg, rgba(245,158,11,0.15), rgba(239,68,68,0.1))'
+                : 'linear-gradient(135deg, rgba(14,165,233,0.15), rgba(99,102,241,0.1))',
+              border: `1px solid ${plan === 'premium' ? 'rgba(245,158,11,0.3)' : 'rgba(14,165,233,0.3)'}`,
+            }}
+          >
+            {plan === 'premium' ? <Crown style={{ width: '1rem', height: '1rem', color: '#f59e0b' }} /> : <Shield style={{ width: '1rem', height: '1rem', color: '#0ea5e9' }} />}
+            <span style={{ fontSize: '1rem', fontWeight: 700, color: plan === 'premium' ? '#fbbf24' : '#38bdf8' }}>
+              {PLAN_LABELS[plan]} · {billing === 'yearly' ? 'Annual' : 'Monthly'}
+            </span>
+          </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            style={{ color: '#475569', fontSize: '0.82rem', marginBottom: '2rem' }}
+          >
+            A confirmation has been sent to your email.
+          </motion.p>
+
+          {/* Action buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65 }}
+            style={{ display: 'flex', gap: '0.75rem' }}
+          >
+            <button
+              onClick={() => navigate('/my-dashboard')}
+              style={{
+                flex: 1, padding: '0.875rem', borderRadius: '0.875rem',
+                background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)',
+                color: '#38bdf8', fontWeight: 600, fontSize: '0.88rem', cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(14,165,233,0.18)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(14,165,233,0.1)' }}
+            >
+              My Dashboard
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              style={{
+                flex: 1, padding: '0.875rem', borderRadius: '0.875rem',
+                background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
+                color: '#fff', fontWeight: 700, fontSize: '0.88rem', border: 'none', cursor: 'pointer',
+                boxShadow: '0 8px 24px rgba(14,165,233,0.3)',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.03)' }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)' }}
+            >
+              Go to Home
+            </button>
+          </motion.div>
+        </div>
       </motion.div>
-      <h2 style={{ fontSize: '1.6rem', fontWeight: 700, color: '#f8fafc', marginBottom: '0.75rem' }}>Payment Successful!</h2>
-      <p style={{ color: '#64748b', fontSize: '0.95rem', marginBottom: '0.5rem' }}>
-        You're now on the <span style={{ color: '#34d399', fontWeight: 600 }}>{PLAN_LABELS[plan]} ({billing})</span> plan.
-      </p>
-      <p style={{ color: '#475569', fontSize: '0.83rem', marginBottom: '2.5rem' }}>A confirmation has been sent to your email.</p>
-      <button
-        onClick={() => navigate('/')}
-        style={{ padding: '0.875rem 2.5rem', borderRadius: '0.875rem', background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', color: '#fff', fontWeight: 600, fontSize: '0.9rem', border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(14,165,233,0.3)' }}
-      >
-        Go to Dashboard
-      </button>
     </motion.div>
   )
 }
@@ -263,14 +410,13 @@ export default function Checkout() {
   const [gateway,  setGateway]  = useState<Gateway>('stripe')
   const [error,    setError]    = useState('')
   const [success,  setSuccess]  = useState(false)
-  // Save plan to Firestore + mark success
   const handlePaymentSuccess = async () => {
     try {
       if (user) {
-        await saveUserPlan(user.uid, planId as 'standard' | 'premium', billing)
+        await saveUserPlan(user.uid, planId, billing)
       }
     } catch (err) {
-      console.warn('Firestore plan save failed (non-blocking):', err)
+      console.error('Failed to save plan to Firestore:', err)
     }
     setSuccess(true)
   }
@@ -387,12 +533,8 @@ export default function Checkout() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.1 }}
-            style={{ borderRadius: '1.5rem', background: 'linear-gradient(160deg,#111d2e,#0b1221)', border: '1px solid rgba(51,65,85,0.4)', overflow: 'hidden' }}
-          >
-            {success ? (
-              <SuccessScreen plan={planId} billing={billing} />
-            ) : (
-              <div style={{ padding: '2rem' }}>
+            style={{ borderRadius: '1.5rem', background: 'linear-gradient(160deg,#111d2e,#0b1221)', border: '1px solid rgba(51,65,85,0.4)', overflow: 'hidden' }}          >
+            <div style={{ padding: '2rem' }}>
                 <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#f8fafc', marginBottom: '1.75rem' }}>
                   Payment Method
                 </h2>
@@ -465,13 +607,16 @@ export default function Checkout() {
                       />
                     )}
                   </motion.div>
-                </AnimatePresence>
-              </div>
-            )}
+                </AnimatePresence>              </div>
           </motion.div>
 
         </div>
       </div>
+
+      {/* Success popup overlay */}
+      <AnimatePresence>
+        {success && <SuccessPopup plan={planId} billing={billing} onClose={() => setSuccess(false)} />}
+      </AnimatePresence>
     </div>
   )
 }

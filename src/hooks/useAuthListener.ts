@@ -9,8 +9,8 @@ export function useAuthListener() {
 
   useEffect(() => {
     setLoading(true)
-    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {        setUser({
+    const unsub = onAuthStateChanged(auth, (firebaseUser) => {      if (firebaseUser) {
+        setUser({
           uid:         firebaseUser.uid,
           email:       firebaseUser.email,
           displayName: firebaseUser.displayName,

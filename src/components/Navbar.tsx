@@ -28,7 +28,8 @@ export default function Navbar() {
       if (dropRef.current && !dropRef.current.contains(e.target as Node)) setDropOpen(false)
     }
     document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)  }, [])
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   const handleLogout = async () => {
     await signOut(auth)
@@ -56,9 +57,7 @@ export default function Navbar() {
             <Brain className="w-4 h-4 text-white" />
           </div>
           <span className="text-lg font-bold gradient-text whitespace-nowrap">MediMind AI</span>
-        </Link>
-
-        {/* Desktop Nav */}
+        </Link>        {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-6">
           {navItems.map(({ path, label, icon: Icon }) => {
             const active = location.pathname === path
@@ -74,8 +73,6 @@ export default function Navbar() {
               </Link>
             )
           })}
-
-          {/* My Dashboard — only visible when logged in */}
           {user && (
             <Link to="/my-dashboard"
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap ${
@@ -88,10 +85,7 @@ export default function Navbar() {
               My Dashboard
             </Link>
           )}
-        </div>
-
-        {/* Right side */}
-        <div className="hidden md:flex items-center gap-3 shrink-0">
+        </div>{/* Right side */}        <div className="hidden md:flex items-center gap-3 shrink-0">
           {/* Sign In button when logged out */}
           {!user && (
             <Link
@@ -101,9 +95,7 @@ export default function Navbar() {
             >
               Sign In
             </Link>
-          )}
-
-          {/* User avatar dropdown */}
+          )}          {/* User avatar dropdown */}
           {user && (
             <div className="relative" ref={dropRef}>
               <button
@@ -149,8 +141,7 @@ export default function Navbar() {
                       background: 'linear-gradient(160deg, #131f35 0%, #0f172a 100%)',
                       border: '1px solid rgba(51,65,85,0.7)',
                       boxShadow: '0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(14,165,233,0.05)',
-                    }}
-                  >
+                    }}                  >
                     {/* Profile header */}
                     <div className="px-5 pt-5 pb-4 flex items-center gap-4"
                          style={{ borderBottom: '1px solid rgba(51,65,85,0.5)' }}>
@@ -180,14 +171,10 @@ export default function Navbar() {
                         <p className="text-xs text-slate-400 truncate">{user.email}</p>
                         <div className="flex items-center gap-1.5 mt-0.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                          <span className="text-[10px] text-emerald-400 font-medium tracking-wide">
-                            Active • {plan.planId === 'premium' ? 'Premium' : plan.planId === 'standard' ? 'Standard' : 'Free'} Plan
-                          </span>
+                          <span className="text-[10px] text-emerald-400 font-medium tracking-wide">Active • {plan.planId === 'premium' ? 'Premium' : plan.planId === 'standard' ? 'Standard' : 'Free'} Plan</span>
                         </div>
                       </div>
-                    </div>
-
-                    {/* Actions */}
+                    </div>                    {/* Sign out button */}
                     <div className="px-3 py-3">
                       <button
                         onClick={handleLogout}
@@ -215,14 +202,10 @@ export default function Navbar() {
                 onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
           {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
-      </div>
-
-      {/* Mobile dropdown */}
+      </div>        {/* Mobile dropdown */}
       {menuOpen && (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-          className="md:hidden border-t border-slate-800 bg-slate-900 px-4 py-3 flex flex-col gap-1">
-
-          {navItems.map(({ path, label, icon: Icon }) => {
+          className="md:hidden border-t border-slate-800 bg-slate-900 px-4 py-3 flex flex-col gap-1">          {navItems.map(({ path, label, icon: Icon }) => {
             const active = location.pathname === path
             return (
               <Link key={path} to={path} onClick={() => setMenuOpen(false)}
@@ -234,12 +217,12 @@ export default function Navbar() {
               </Link>
             )
           })}
-
-          {/* My Dashboard — only visible when logged in */}
           {user && (
             <Link to="/my-dashboard" onClick={() => setMenuOpen(false)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium ${
-                location.pathname === '/my-dashboard' ? 'bg-sky-500/15 text-sky-400' : 'text-slate-400 hover:text-white hover:bg-white/5'
+                location.pathname === '/my-dashboard'
+                  ? 'bg-sky-500/15 text-sky-400'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}>
               <LayoutGrid className="w-4 h-4" />
               My Dashboard
