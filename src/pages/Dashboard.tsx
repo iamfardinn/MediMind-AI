@@ -1,5 +1,7 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import gsap from 'gsap'
+import CustomCursor from '../components/CustomCursor'
 import {
   LineChart, Line, AreaChart, Area, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer, Legend
@@ -8,7 +10,7 @@ import {
   Heart, Thermometer, Wind, Activity, TrendingUp,
   Brain, Shield, Zap, ArrowUpRight, CalendarDays,
   Users, UserCheck, UserPlus, Star, Crown, BadgeCheck, MoreHorizontal,
-  TrendingDown, Minus
+  TrendingDown, Minus, MessageSquare, Stethoscope, LayoutDashboard, CreditCard,
 } from 'lucide-react'
 import { useChatStore } from '../store/useChatStore'
 import { Link } from 'react-router-dom'
@@ -65,10 +67,9 @@ function StatCard({
 }){
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus
   const trendColor = trend === 'up' ? '#34d399' : trend === 'down' ? '#f87171' : '#94a3b8'
-
   return (
-    <motion.div
-      {...fadeUp(index * 0.08)}
+    <MagneticCard
+      glowColor={glowColor}
       className="relative overflow-hidden rounded-2xl cursor-default group"
       style={{
         background: 'linear-gradient(160deg, #131f35 0%, #0f172a 100%)',
@@ -76,7 +77,6 @@ function StatCard({
         padding: '1.6rem',
         transition: 'border-color 0.3s, box-shadow 0.3s',
       }}
-      whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
     >
       {/* Glow blob */}
       <div style={{
@@ -128,10 +128,9 @@ function StatCard({
       {/* Trend row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
         <TrendIcon style={{ width: '0.875rem', height: '0.875rem', color: trendColor, flexShrink: 0 }} />
-        <span style={{ fontSize: '0.72rem', color: trendColor, fontWeight: 600 }}>{trendValue}</span>
-        <span style={{ fontSize: '0.72rem', color: '#64748b', marginLeft: '0.1rem' }}>vs last month</span>
+        <span style={{ fontSize: '0.72rem', color: trendColor, fontWeight: 600 }}>{trendValue}</span>        <span style={{ fontSize: '0.72rem', color: '#64748b', marginLeft: '0.1rem' }}>vs last month</span>
       </div>
-    </motion.div>
+    </MagneticCard>
   )
 }
 
@@ -159,8 +158,8 @@ function ChartTooltip({
   active, payload, label, unit, accentColor,
 }: {
   active?: boolean
-  payload?: { value: number; name: string; color: string }[]
-  label?: string
+  payload?: readonly { value: number; name: string; color: string }[]
+  label?: string | number
   unit: string
   accentColor: string
 }) {
@@ -323,31 +322,293 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }
   )
 }
 
+// ─── Cursor Spotlight (replaced by CustomCursor component) ────────────────────
+
+// ─── Floating Side Tabs ───────────────────────────────────────────────────────
+const SIDE_TABS = [
+  { icon: MessageSquare,  label: 'AI Chat',       to: '/chat',        color: '#0ea5e9', glow: 'rgba(14,165,233,0.4)' },
+  { icon: Stethoscope,    label: 'Doctors',        to: '/doctors',     color: '#8b5cf6', glow: 'rgba(139,92,246,0.4)' },
+  { icon: Shield,         label: 'Symptoms',       to: '/symptoms',    color: '#10b981', glow: 'rgba(16,185,129,0.4)' },
+  { icon: LayoutDashboard,label: 'Dashboard',      to: '/my-dashboard',color: '#f59e0b', glow: 'rgba(245,158,11,0.4)' },
+  { icon: CreditCard,     label: 'Pricing',        to: '/pricing',     color: '#ec4899', glow: 'rgba(236,72,153,0.4)' },
+]
+
+function FloatingSideTabs() {
+  const [visible, setVisible] = useState(false)
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
+
+  useEffect(() => {
+    const check = () => setVisible(window.scrollY > 200 && window.innerWidth >= 768)
+    window.addEventListener('scroll', check, { passive: true })
+    window.addEventListener('resize', check, { passive: true })
+    return () => { window.removeEventListener('scroll', check); window.removeEventListener('resize', check) }
+  }, [])
+
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          initial={{ x: 80, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: 80, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 24 }}          style={{
+            position: 'fixed', right: '1rem', top: 0, bottom: 0,
+            display: 'flex', flexDirection: 'column', gap: '0.5rem', zIndex: 50,
+            justifyContent: 'center',
+          }}
+        >
+          {SIDE_TABS.map((tab, i) => {
+            const Icon = tab.icon
+            const isHovered = hoveredIdx === i
+            return (
+              <motion.div
+                key={tab.label}
+                initial={{ x: 60, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 22, delay: i * 0.06 }}
+              >
+                <Link
+                  to={tab.to}
+                  onMouseEnter={() => setHoveredIdx(i)}
+                  onMouseLeave={() => setHoveredIdx(null)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '0.6rem',
+                    padding: '0.6rem 0.75rem', borderRadius: '0.875rem',
+                    background: isHovered
+                      ? `linear-gradient(135deg, ${tab.color}22, ${tab.color}10)`
+                      : 'rgba(15,23,42,0.85)',
+                    border: `1px solid ${isHovered ? tab.color + '55' : 'rgba(51,65,85,0.5)'}`,
+                    backdropFilter: 'blur(12px)',
+                    boxShadow: isHovered ? `0 0 20px ${tab.glow}` : '0 4px 12px rgba(0,0,0,0.3)',
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.25s ease',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap' as const,
+                  }}
+                >
+                  <Icon style={{
+                    width: '1.1rem', height: '1.1rem',
+                    color: isHovered ? tab.color : '#94a3b8',
+                    transition: 'color 0.2s',
+                    flexShrink: 0,
+                  }} />
+                  <AnimatePresence>
+                    {isHovered && (
+                      <motion.span
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={{ width: 'auto', opacity: 1 }}
+                        exit={{ width: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        style={{
+                          fontSize: '0.78rem', fontWeight: 600,
+                          color: tab.color,
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {tab.label}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </Link>
+              </motion.div>
+            )
+          })}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
+// ─── GSAP Magnetic Tilt Card Wrapper ──────────────────────────────────────────
+function MagneticCard({ children, glowColor, className, style }: {
+  children: React.ReactNode
+  glowColor: string
+  className?: string
+  style?: React.CSSProperties
+}) {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const glowRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const card = cardRef.current
+    const glow = glowRef.current
+    if (!card || !glow) return
+
+    const handleEnter = () => {
+      gsap.to(card, {
+        scale: 1.02,
+        duration: 0.4,
+        ease: 'power2.out',
+        boxShadow: `0 0 30px ${glowColor}33, 0 8px 32px rgba(0,0,0,0.3)`,
+      })
+    }
+
+    const handleMove = (e: MouseEvent) => {
+      const rect = card.getBoundingClientRect()
+      const px = (e.clientX - rect.left) / rect.width
+      const py = (e.clientY - rect.top) / rect.height
+      const rx = (py - 0.5) * -10 // rotateX
+      const ry = (px - 0.5) * 10  // rotateY
+
+      gsap.to(card, {
+        rotateX: rx,
+        rotateY: ry,
+        duration: 0.5,
+        ease: 'power2.out',
+        transformPerspective: 800,
+      })
+
+      gsap.to(glow, {
+        opacity: 1,
+        background: `radial-gradient(circle at ${px * 100}% ${py * 100}%, ${glowColor}35 0%, transparent 60%)`,
+        duration: 0.3,
+      })
+    }
+
+    const handleLeave = () => {
+      gsap.to(card, {
+        rotateX: 0,
+        rotateY: 0,
+        scale: 1,
+        duration: 0.6,
+        ease: 'elastic.out(1, 0.5)',
+        boxShadow: 'none',
+      })
+      gsap.to(glow, { opacity: 0, duration: 0.4 })
+    }
+
+    card.addEventListener('mouseenter', handleEnter)
+    card.addEventListener('mousemove', handleMove)
+    card.addEventListener('mouseleave', handleLeave)
+
+    return () => {
+      card.removeEventListener('mouseenter', handleEnter)
+      card.removeEventListener('mousemove', handleMove)
+      card.removeEventListener('mouseleave', handleLeave)
+    }
+  }, [glowColor])
+
+  return (
+    <div
+      ref={cardRef}
+      className={className}
+      data-magnetic
+      style={{
+        ...style,
+        transformStyle: 'preserve-3d',
+        willChange: 'transform',
+        position: 'relative',
+      }}
+    >
+      <div
+        ref={glowRef}
+        style={{
+          position: 'absolute', inset: 0, borderRadius: 'inherit',
+          pointerEvents: 'none', zIndex: 1, opacity: 0,
+        }}
+      />
+      {children}
+    </div>
+  )
+}
+
 export default function Dashboard() {
   const { vitals } = useChatStore()
   const latest = vitals[vitals.length - 1]
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
   return (
-    <div style={{ width: '100%', minHeight: '100vh', backgroundColor: '#0f172a' }}>
-      <div className="px-4 py-8 sm:px-6 sm:py-10 md:px-10 lg:px-12" style={{ maxWidth: '1280px', margin: '0 auto', paddingBottom: '5rem' }}>        {/* PAGE HEADER */}
+    <div style={{ width: '100%', minHeight: '100vh', backgroundColor: '#0f172a', position: 'relative', overflow: 'hidden' }}>      {/* Ambient background glow that follows cursor */}
+      <CustomCursor />
+      {/* Floating side quick-action tabs */}
+      <FloatingSideTabs />
+
+      {/* Animated floating background icons */}
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '500px', overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
+        {[
+          { Icon: Heart, x: '10%', y: '15%', size: 28, delay: 0,   color: 'rgba(244,63,94,0.08)' },
+          { Icon: Brain, x: '85%', y: '20%', size: 32, delay: 0.5, color: 'rgba(14,165,233,0.08)' },
+          { Icon: Shield, x: '75%', y: '60%', size: 24, delay: 1,   color: 'rgba(16,185,129,0.07)' },
+          { Icon: Activity, x: '20%', y: '70%', size: 26, delay: 1.5, color: 'rgba(99,102,241,0.08)' },
+          { Icon: Zap, x: '50%', y: '25%', size: 20, delay: 0.8, color: 'rgba(245,158,11,0.07)' },
+          { Icon: Thermometer, x: '35%', y: '55%', size: 22, delay: 1.2, color: 'rgba(249,115,22,0.07)' },
+          { Icon: Stethoscope, x: '65%', y: '40%', size: 30, delay: 0.3, color: 'rgba(139,92,246,0.08)' },
+        ].map(({ Icon, x, y, size, delay, color }, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{
+              opacity: 1, scale: 1,
+              y: [0, -12, 0, 12, 0],
+            }}
+            transition={{
+              opacity: { duration: 0.8, delay },
+              scale: { duration: 0.8, delay },
+              y: { duration: 6 + i * 0.5, repeat: Infinity, ease: 'easeInOut', delay },
+            }}
+            style={{ position: 'absolute', left: x, top: y }}
+          >
+            <Icon style={{ width: size, height: size, color, strokeWidth: 1.2 }} />
+          </motion.div>
+        ))}
+      </div>      <div className="px-4 py-8 sm:px-6 sm:py-10 md:px-10 lg:px-12" style={{ maxWidth: '1280px', margin: '0 auto', paddingBottom: '5rem', position: 'relative', zIndex: 2 }}>
+        {/* PAGE HEADER */}
         <motion.div
-          {...fadeUp(0)}          className="flex flex-col items-center text-center gap-4"
-          style={{ marginTop: '1rem' }}
+          {...fadeUp(0)}
+          className="flex flex-col items-center text-center gap-4"
+          style={{ marginTop: '1rem', position: 'relative' }}
         >
-          <div className="flex items-center gap-2 text-slate-500 text-sm justify-center">
+          {/* Pulsing rings behind the title */}
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none' }}>
+            {[0, 1, 2].map(i => (
+              <motion.div
+                key={i}
+                initial={{ scale: 0.8, opacity: 0.4 }}
+                animate={{ scale: [0.8, 1.4, 0.8], opacity: [0.15, 0, 0.15] }}
+                transition={{ duration: 4, delay: i * 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                style={{
+                  position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                  width: `${140 + i * 80}px`, height: `${140 + i * 80}px`,
+                  borderRadius: '9999px',
+                  border: '1px solid rgba(14,165,233,0.2)',
+                }}
+              />
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className="flex items-center gap-2 text-slate-500 text-sm justify-center"
+          >
             <CalendarDays className="w-4 h-4 shrink-0" />
             <span>{today}</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
-            Health{' '}
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight"
+          >
+            MediMind{' '}
             <span className="bg-linear-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">
-              Dashboard
+              AI
             </span>
-          </h1>
-          <p className="text-slate-400 text-sm lg:text-base">
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
+            className="text-slate-400 text-sm lg:text-base"
+          >
             Your real-time vitals and AI-powered health overview
-          </p>
-        </motion.div>{/* VITALS GRID */}
+          </motion.p>
+        </motion.div>
+
+        {/* VITALS GRID */}
         <section style={{ marginTop: '3.5rem' }}>
           <SectionHeader title="Current Vitals" subtitle="Updated based on your latest recorded entry" />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
@@ -384,9 +645,10 @@ export default function Dashboard() {
 
         {/* AI TOOLS */}
         <section style={{ marginTop: '3.5rem', paddingBottom: '1rem' }}>
-          <SectionHeader title="AI Tools" subtitle="Powered by GitHub Copilot — real-time intelligence" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">            {/* ── Card 1: AI Medical Assistant ── */}            <motion.div
-              {...fadeUp(0.1)}
+          <SectionHeader title="AI Tools" subtitle="Powered by GitHub Copilot — real-time intelligence" />          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {/* ── Card 1: AI Medical Assistant ── */}
+            <MagneticCard
+              glowColor="#0ea5e9"
               className="relative overflow-hidden rounded-3xl flex flex-col"
               style={{ background: 'linear-gradient(145deg, #0c1a2e 0%, #0f172a 60%, #0c1929 100%)', border: '1px solid rgba(14,165,233,0.2)', padding: '2rem' }}
             >
@@ -431,13 +693,12 @@ export default function Dashboard() {
               {/* CTA */}
               <Link to="/chat" className="flex items-center justify-center gap-2 rounded-xl text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
                 style={{ padding: '0.75rem', background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', boxShadow: '0 4px 20px rgba(14,165,233,0.3)' }}>
-                Start Chatting <ArrowUpRight className="w-4 h-4" />
-              </Link>
-            </motion.div>
+                Start Chatting <ArrowUpRight className="w-4 h-4" />              </Link>
+            </MagneticCard>
 
             {/* ── Card 2: Symptom Analyzer ── */}
-            <motion.div
-              {...fadeUp(0.18)}
+            <MagneticCard
+              glowColor="#10b981"
               className="relative overflow-hidden rounded-3xl flex flex-col"
               style={{ background: 'linear-gradient(145deg, #0a1f18 0%, #0f172a 60%, #0a1a14 100%)', border: '1px solid rgba(16,185,129,0.2)', padding: '2rem' }}
             >
@@ -476,13 +737,12 @@ export default function Dashboard() {
 
               <Link to="/symptoms" className="flex items-center justify-center gap-2 rounded-xl text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
                 style={{ padding: '0.75rem', background: 'linear-gradient(135deg, #10b981, #14b8a6)', boxShadow: '0 4px 20px rgba(16,185,129,0.3)' }}>
-                Analyze Symptoms <ArrowUpRight className="w-4 h-4" />
-              </Link>
-            </motion.div>
+                Analyze Symptoms <ArrowUpRight className="w-4 h-4" />              </Link>
+            </MagneticCard>
 
             {/* ── Card 3: Real-Time Insights ── */}
-            <motion.div
-              {...fadeUp(0.26)}
+            <MagneticCard
+              glowColor="#f59e0b"
               className="relative overflow-hidden rounded-3xl flex flex-col"
               style={{ background: 'linear-gradient(145deg, #1a1200 0%, #0f172a 60%, #1a1200 100%)', border: '1px solid rgba(245,158,11,0.2)', padding: '2rem' }}
             >
@@ -521,9 +781,8 @@ export default function Dashboard() {
 
               <Link to="/" className="flex items-center justify-center gap-2 rounded-xl text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
                 style={{ padding: '0.75rem', background: 'linear-gradient(135deg, #f59e0b, #f97316)', boxShadow: '0 4px 20px rgba(245,158,11,0.3)' }}>
-                View Trends <ArrowUpRight className="w-4 h-4" />
-              </Link>
-            </motion.div>
+                View Trends <ArrowUpRight className="w-4 h-4" />              </Link>
+            </MagneticCard>
 
           </div>        </section>
 
@@ -564,7 +823,7 @@ export default function Dashboard() {
               <button className="text-xs text-sky-400 hover:text-sky-300 transition-colors">View All</button>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm min-w-[520px]">
+              <table className="w-full text-sm min-w-130">
                 <thead>
                   <tr className="text-xs text-slate-500 uppercase tracking-wider border-b border-slate-700/30">
                     <th className="font-medium text-left px-4 py-3 sm:px-6">Client</th>
@@ -707,7 +966,7 @@ export default function Dashboard() {
                 <BadgeCheck className="w-5 h-5" />
                 Verified Reviews
               </div>
-              <p className="text-slate-500 text-xs text-center max-w-[8rem]">
+              <p className="text-slate-500 text-xs text-center max-w-32">
                 All reviews from active premium members
               </p>
             </div>

@@ -5,6 +5,8 @@ import ReactMarkdown from 'react-markdown'
 import { Link } from 'react-router-dom'
 import { streamGeminiResponse } from '../services/copilot'
 import { useAuthStore } from '../store/useAuthStore'
+import { useUserPlan } from '../hooks/useUserPlan'
+import { hasFeature } from '../services/planGating'
 
 const BODY_SYSTEMS = [
   'Head & Neurological', 'Eyes & Vision', 'Ears, Nose & Throat',
@@ -94,8 +96,9 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
   }
 
   const { user } = useAuthStore()
+  const { plan } = useUserPlan()
 
-  // ── Auth Gate ──────────────────────────────────────────────────────────────
+  // ── Auth + Plan Gate ───────────────────────────────────────────────────────
   if (!user) {
     return (
       <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-16"
@@ -161,6 +164,51 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
             {' '}and{' '}
             <Link to="/chat" className="text-sky-500 hover:text-sky-400 underline underline-offset-2">AI Chat</Link>
             {' '}without signing in.
+          </p>
+        </motion.div>
+      </div>
+    )
+  }
+  if (plan.planId === 'free') {
+    return (
+      <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-16"
+           style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(16,185,129,0.08) 0%, #0f172a 60%)' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="flex flex-col items-center text-center"
+          style={{ maxWidth: '480px' }}
+        >
+          <div className="relative mb-6">
+            <div className="w-24 h-24 rounded-3xl flex items-center justify-center"
+                 style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(14,165,233,0.15))', border: '1px solid rgba(16,185,129,0.25)' }}>
+              <Shield className="w-10 h-10 text-emerald-400" />
+            </div>
+            <div className="absolute -bottom-2 -right-2 w-9 h-9 rounded-xl flex items-center justify-center"
+                 style={{ background: 'linear-gradient(135deg, #f59e0b, #ef4444)', boxShadow: '0 4px 12px rgba(245,158,11,0.4)' }}>
+              <Lock className="w-4 h-4 text-white" />
+            </div>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+            Upgrade required<br />
+            <span className="bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">Symptom Analyzer</span>
+          </h2>
+          <p className="text-slate-400 text-sm leading-relaxed mb-8">
+            The Symptom Analyzer is available for Standard and Premium plans.<br />
+            Upgrade to unlock AI-powered health assessments.
+          </p>
+          <Link to="/pricing"
+            className="px-8 py-3 rounded-xl text-white text-sm font-semibold transition-all hover:scale-105"
+            style={{ background: 'linear-gradient(135deg, #10b981, #0ea5e9)', boxShadow: '0 4px 20px rgba(16,185,129,0.3)' }}>
+            View Plans & Upgrade
+          </Link>
+          <p className="text-xs text-slate-600 mt-5">
+            You can still use the{' '}
+            <Link to="/chat" className="text-sky-500 hover:text-sky-400 underline underline-offset-2">AI Chat</Link>
+            {' '}and{' '}
+            <Link to="/" className="text-sky-500 hover:text-sky-400 underline underline-offset-2">Dashboard</Link>
+            {' '}on the Free plan.
           </p>
         </motion.div>
       </div>

@@ -100,16 +100,14 @@ export default function Pricing() {
         <div style={{ position: 'absolute', top: '-20%', left: '50%', transform: 'translateX(-50%)', width: '900px', height: '600px', background: 'radial-gradient(ellipse, rgba(14,165,233,0.07) 0%, transparent 65%)', borderRadius: '50%' }} />
         <div style={{ position: 'absolute', bottom: '-10%', left: '-10%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%)', borderRadius: '50%' }} />
         <div style={{ position: 'absolute', bottom: '10%', right: '-5%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(245,158,11,0.05) 0%, transparent 70%)', borderRadius: '50%' }} />
-      </div>
-
-      <div className="relative z-10" style={{ maxWidth: '1080px', margin: '0 auto', padding: '5rem 1.5rem 8rem' }}>
+      </div>      <div className="relative z-10 px-4 sm:px-6 lg:px-8" style={{ maxWidth: '1080px', margin: '0 auto', paddingTop: '3rem', paddingBottom: '5rem' }}>
 
         {/* ── Hero ── */}
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, ease: [0.25, 0.1, 0.25, 1] }}
-          style={{ textAlign: 'center', marginBottom: '4rem' }}
+          style={{ textAlign: 'center', marginBottom: '3rem' }}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -168,10 +166,8 @@ export default function Pricing() {
               </button>
             ))}
           </div>
-        </motion.div>
-
-        {/* ── Plan Cards ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '5rem', alignItems: 'stretch' }}>
+        </motion.div>        {/* ── Plan Cards ── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6" style={{ marginBottom: '4rem', alignItems: 'stretch' }}>
           {PLANS.map((plan, i) => {
             const Icon   = plan.icon
             const price  = billing === 'monthly' ? plan.monthly : plan.yearly
@@ -209,9 +205,9 @@ export default function Pricing() {
                     : plan.id === 'standard'
                     ? 'linear-gradient(90deg, #0ea5e9, #6366f1)'
                     : 'linear-gradient(90deg, #f59e0b, #ef4444)',
-                }} />                <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                }} />                <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
                   {/* Badge row — always reserve space so cards align */}
-                  <div style={{ height: '2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center' }}>
+                  <div style={{ height: '1.75rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center' }}>
                     {plan.badge && (
                       <span style={{
                         fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.05em',
@@ -252,7 +248,7 @@ export default function Pricing() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
                           transition={{ duration: 0.2 }}
-                          style={{ fontSize: '3rem', fontWeight: 800, color: '#f8fafc', lineHeight: 1 }}
+                          style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 800, color: '#f8fafc', lineHeight: 1 }}
                         >
                           ${price}
                         </motion.span>
@@ -347,18 +343,18 @@ export default function Pricing() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.5 }}
-          style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '5rem' }}
+          className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"
+          style={{ marginBottom: '4rem' }}
         >
-          {STATS.map(({ icon: Icon, value, label }) => (
-            <div key={label} style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
-              padding: '1.75rem 1rem', borderRadius: '1.25rem', textAlign: 'center',
+          {STATS.map(({ icon: Icon, value, label }) => (            <div key={label} style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem',
+              padding: '1.25rem 0.75rem', borderRadius: '1.25rem', textAlign: 'center',
               background: 'rgba(15,23,42,0.5)', border: '1px solid rgba(51,65,85,0.3)',
             }}>
               <div style={{ width: '2.25rem', height: '2.25rem', borderRadius: '0.625rem', background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Icon style={{ width: '1rem', height: '1rem', color: '#38bdf8' }} />
               </div>
-              <p style={{ fontSize: '1.6rem', fontWeight: 800, color: '#f8fafc', lineHeight: 1 }}>{value}</p>
+              <p style={{ fontSize: 'clamp(1.2rem, 3vw, 1.6rem)', fontWeight: 800, color: '#f8fafc', lineHeight: 1 }}>{value}</p>
               <p style={{ fontSize: '0.75rem', color: '#64748b' }}>{label}</p>
             </div>
           ))}
@@ -371,10 +367,10 @@ export default function Pricing() {
           transition={{ delay: 0.65, duration: 0.5 }}
           style={{ marginBottom: '5rem' }}
         >
-          <h2 style={{ fontSize: '1.6rem', fontWeight: 700, color: '#f1f5f9', textAlign: 'center', marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.6rem)', fontWeight: 700, color: '#f1f5f9', textAlign: 'center', marginBottom: '2rem' }}>
             Frequently Asked Questions
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {[
               { q: 'Can I cancel anytime?',                 a: 'Yes. Cancel anytime with no questions asked. You keep access until the end of your billing period.' },
               { q: 'Is my health data private?',            a: 'Absolutely. All data is encrypted, never sold, and only accessible to you.' },
@@ -404,9 +400,8 @@ export default function Pricing() {
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.75, duration: 0.5 }}
-          style={{
-            textAlign: 'center', borderRadius: '2rem', padding: '4rem 2rem',
+          transition={{ delay: 0.75, duration: 0.5 }}          style={{
+            textAlign: 'center', borderRadius: '1.5rem', padding: 'clamp(2rem, 5vw, 4rem) clamp(1rem, 4vw, 2rem)',
             position: 'relative', overflow: 'hidden',
             background: 'linear-gradient(135deg, rgba(14,165,233,0.08) 0%, rgba(99,102,241,0.08) 100%)',
             border: '1px solid rgba(14,165,233,0.18)',
@@ -419,22 +414,23 @@ export default function Pricing() {
             <div style={{ width: '3.5rem', height: '3.5rem', borderRadius: '1rem', background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 0 32px rgba(14,165,233,0.4)' }}>
               <Brain style={{ width: '1.5rem', height: '1.5rem', color: '#fff' }} />
             </div>
-            <h2 style={{ fontSize: '1.9rem', fontWeight: 700, color: '#f8fafc', marginBottom: '0.875rem' }}>
+            <h2 style={{ fontSize: 'clamp(1.3rem, 4vw, 1.9rem)', fontWeight: 700, color: '#f8fafc', marginBottom: '0.875rem' }}>
               Ready to take control of your health?
             </h2>
             <p style={{ color: '#64748b', marginBottom: '2.5rem', maxWidth: '420px', margin: '0 auto 2.5rem', lineHeight: 1.65 }}>
               Join 50,000+ users who trust MediMind AI for smarter health decisions every day.
-            </p>            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.875rem', justifyContent: 'center' }}>
+            </p>            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
               <button
                 onClick={() => navigate(user ? '/' : '/login')}
+                className="w-full sm:w-auto"
                 style={{ padding: '0.9rem 2rem', borderRadius: '0.875rem', fontWeight: 600, fontSize: '0.9rem', color: '#fff', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', boxShadow: '0 8px 28px rgba(14,165,233,0.35)', transition: 'all 0.2s' }}
                 onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.03)'; e.currentTarget.style.filter = 'brightness(1.1)' }}
                 onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)';    e.currentTarget.style.filter = 'brightness(1)' }}
               >
                 Get Started Free
-              </button>
-              <Link to="/"
-                style={{ padding: '0.9rem 2rem', borderRadius: '0.875rem', fontWeight: 600, fontSize: '0.9rem', color: '#94a3b8', textDecoration: 'none', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', transition: 'all 0.2s' }}
+              </button>              <Link to="/"
+                className="w-full sm:w-auto text-center"
+                style={{ padding: '0.9rem 2rem', borderRadius: '0.875rem', fontWeight: 600, fontSize: '0.9rem', color: '#94a3b8', textDecoration: 'none', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', transition: 'all 0.2s', display: 'inline-block' }}
                 onMouseEnter={e => { e.currentTarget.style.color = '#f1f5f9'; e.currentTarget.style.transform = 'scale(1.02)' }}
                 onMouseLeave={e => { e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.transform = 'scale(1)' }}
               >

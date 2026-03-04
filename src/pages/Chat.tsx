@@ -1,9 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Trash2, Bot, User, Loader2, Brain } from 'lucide-react'
+import { Send, Trash2, Bot, User, Loader2, Brain, Lock, MessageSquare, Crown } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
+import { Link } from 'react-router-dom'
 import { useChatStore } from '../store/useChatStore'
 import { streamGeminiResponse } from '../services/copilot'
+import { useAuthStore } from '../store/useAuthStore'
+import { useUserPlan } from '../hooks/useUserPlan'
+import { hasFeature, getRemainingMessages, incrementDailyMessageCount, isAtDailyLimit, FREE_DAILY_LIMIT } from '../services/planGating'
 
 const MD_COMPONENTS: React.ComponentProps<typeof ReactMarkdown>['components'] = {}
 
@@ -35,14 +39,75 @@ export default function Chat() {
   const [input, setInput] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const { user } = useAuthStore()
+  const { plan } = useUserPlan()
+  const [remaining, setRemaining] = useState<number>(FREE_DAILY_LIMIT)
+
+  // Refresh remaining message count
+  useEffect(() => {
+    if (user && plan.planId === 'free') {
+      setRemaining(getRemainingMessages(user.uid))
+    }
+  }, [user, plan.planId, messages.length])
+
+  const isFree = plan.planId === 'free'
+  const atLimit = user ? isFree && isAtDailyLimit(user.uid) : false
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, streamingText])
 
+  // ── Auth Gate ──
+  if (!user) {
+    return (
+      <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-16"
+           style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(14,165,233,0.08) 0%, #0f172a 60%)' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="flex flex-col items-center text-center"
+          style={{ maxWidth: '480px' }}
+        >
+          <div className="relative mb-6">
+            <div className="w-24 h-24 rounded-3xl flex items-center justify-center"
+                 style={{ background: 'linear-gradient(135deg, rgba(14,165,233,0.15), rgba(99,102,241,0.15))', border: '1px solid rgba(14,165,233,0.25)' }}>
+              <Brain className="w-10 h-10 text-sky-400" />
+            </div>
+            <div className="absolute -bottom-2 -right-2 w-9 h-9 rounded-xl flex items-center justify-center"
+                 style={{ background: 'linear-gradient(135deg, #f59e0b, #ef4444)', boxShadow: '0 4px 12px rgba(245,158,11,0.4)' }}>
+              <Lock className="w-4 h-4 text-white" />
+            </div>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+            Sign in to use the<br />
+            <span className="bg-linear-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">AI Health Chat</span>
+          </h2>
+          <p className="text-slate-400 text-sm leading-relaxed mb-8">
+            Create a free account to get 20 messages per day, or upgrade for unlimited access.
+          </p>
+          <Link to="/login"
+            className="px-8 py-3 rounded-xl text-white text-sm font-semibold transition-all hover:scale-105"
+            style={{ background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', boxShadow: '0 4px 20px rgba(14,165,233,0.3)' }}>
+            Sign In to Chat
+          </Link>
+        </motion.div>
+      </div>
+    )
+  }
+
   const handleSend = async () => {
     const text = input.trim()
     if (!text || isStreaming) return
+
+    // Check daily limit for free users
+    if (isFree && isAtDailyLimit(user.uid)) return
+
+    // Increment counter for free users
+    if (isFree) {
+      incrementDailyMessageCount(user.uid)
+      setRemaining(getRemainingMessages(user.uid))
+    }
 
     addMessage({ role: 'user', content: text })
     setInput('')
@@ -238,6 +303,25 @@ export default function Chat() {
       </div>
 
       {/* Input Area */}
+      {isFree && (
+        <div className="w-full flex flex-col items-center mb-2">
+          <div className="px-4 py-2 rounded-xl bg-sky-900/60 border border-sky-500/30 text-sky-300 text-xs font-semibold flex items-center gap-2">
+            {atLimit
+              ? <>You have reached your <span className="font-bold">20 messages</span> daily limit for Free plan.</>
+              : <>Messages remaining today: <span className="font-bold">{remaining} / 20</span></>}
+          </div>
+          {atLimit && (
+            <div className="mt-3 flex flex-col items-center">
+              <p className="text-xs text-slate-400 mb-2">Upgrade to Standard or Premium for unlimited AI chat.</p>
+              <Link to="/pricing"
+                className="px-6 py-2 rounded-xl text-white text-xs font-semibold transition-all hover:scale-105"
+                style={{ background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', boxShadow: '0 4px 20px rgba(14,165,233,0.3)' }}>
+                Upgrade Plan
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginTop: '0.75rem' }}>
         <div className="glass rounded-2xl flex items-end gap-2 sm:gap-3 focus-within:border-sky-500/40 transition-colors"
              style={{ padding: '0.65rem 0.75rem' }}>
@@ -250,10 +334,11 @@ export default function Chat() {
             rows={1}
             className="flex-1 bg-transparent resize-none text-sm text-white placeholder:text-slate-500 outline-none leading-relaxed"
             style={{ minHeight: '36px', maxHeight: '120px' }}
+            disabled={atLimit}
           />
           <button
             onClick={handleSend}
-            disabled={!input.trim() || isStreaming}
+            disabled={!input.trim() || isStreaming || atLimit}
             className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-linear-to-br from-sky-500 to-indigo-500 flex items-center justify-center shrink-0 disabled:opacity-40 disabled:cursor-not-allowed hover:from-sky-400 hover:to-indigo-400 transition-all duration-200"
           >
             {isStreaming
