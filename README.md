@@ -38,10 +38,17 @@
 - Client management overview with status tracking
 
 ### 👤 My Dashboard (Personalized)
-- Full-page user dashboard with 5 tabs: Overview, Chat History, My Plan, AI Insights, Medications
+- Full-page user dashboard with 6 tabs: Overview, Chat History, Appointments, My Plan, AI Insights, Medications
 - Profile card with avatar, plan badge, verified status, and dynamic "Days Active" counter
 - AI-extracted recommendations and medication references from chat history
 - Plan details pulled in real-time from Firestore
+
+### 🩻 Doctor Consultation System
+- Browse 12 verified doctors across 10 specialties with search, filter, and sort
+- Specialty filtering, online-only toggle, sort by rating/fee/experience
+- Booking modal with date picker, time slot selection, consultation type (video/in-person), and notes
+- Real-time appointment storage in Firestore with status tracking (upcoming/completed/cancelled)
+- Appointment management from My Dashboard — view, cancel, and track bookings
 
 ### 🔐 Authentication
 - **Firebase Auth** — email/password sign-up & sign-in
@@ -89,20 +96,25 @@
 │   ├── components/
 │   │   └── Navbar.tsx              # Top nav with auth-aware links & avatar dropdown
 │   ├── hooks/
+│   │   ├── useAppointments.ts      # Real-time Firestore appointments listener
 │   │   ├── useAuthListener.ts      # Firebase auth state observer
 │   │   └── useUserPlan.ts          # Real-time Firestore plan listener
+│   ├── data/
+│   │   └── doctors.ts              # 12 mock doctors across 10 specialties
 │   ├── pages/
 │   │   ├── Dashboard.tsx           # Home — vitals charts, stats, client list
 │   │   ├── Chat.tsx                # AI medical chat with streaming
 │   │   ├── SymptomChecker.tsx      # Multi-step symptom analyzer
+│   │   ├── Doctors.tsx             # Doctor directory with search, filter & booking
 │   │   ├── Pricing.tsx             # 3-tier pricing page with FAQ
 │   │   ├── Checkout.tsx            # Stripe / SSLCommerz payment flow
-│   │   ├── MyDashboard.tsx         # Personalized user dashboard (5 tabs)
+│   │   ├── MyDashboard.tsx         # Personalized user dashboard (6 tabs)
 │   │   ├── Login.tsx               # Email/password + Google auth
 │   │   ├── PaymentSuccess.tsx      # Post-payment success handler
 │   │   ├── PaymentFail.tsx         # Payment failure page
 │   │   └── PaymentCancel.tsx       # Payment cancellation page
 │   ├── services/
+│   │   ├── appointments.ts         # Firestore CRUD for doctor appointments
 │   │   ├── copilot.ts              # GPT-4o-mini streaming via GitHub Models
 │   │   ├── gemini.ts               # Gemini 1.5 Flash (alternate AI provider)
 │   │   ├── firebase.ts             # Firebase app, auth, Firestore init
@@ -189,7 +201,22 @@ PORT=4000
 psql -U postgres -f server/setup.sql
 ```
 
-### 5. Run the app
+### 5. Deploy Firestore rules & indexes
+
+```bash
+# Install Firebase CLI if not already installed
+npm install -g firebase-tools
+
+# Login & deploy
+firebase login
+firebase deploy --only firestore
+```
+
+This deploys the security rules from `firestore.rules` and the composite index from `firestore.indexes.json` (required for the appointments query).
+
+> **Alternatively**, if you're using Firestore in **test mode** and don't want to deploy rules, the app will still work — but you'll see a console warning when the composite index is missing. Click the link in the browser console error to create it manually.
+
+### 6. Run the app
 
 ```bash
 # Terminal 1 — Backend
@@ -211,6 +238,7 @@ The app will be available at **http://localhost:5173**
 | Home | `/` | Vitals dashboard, health stats, client list, reviews |
 | AI Chat | `/chat` | Streaming AI medical assistant |
 | Symptom Checker | `/symptoms` | Multi-step symptom analysis with urgency detection |
+| Doctors | `/doctors` | Doctor directory with search, filter & booking |
 | Pricing | `/pricing` | Plan comparison with billing toggle & FAQ |
 | Checkout | `/checkout` | Stripe / SSLCommerz payment flow |
 | My Dashboard | `/my-dashboard` | Personalized user dashboard (auth required) |

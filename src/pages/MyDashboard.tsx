@@ -4,21 +4,24 @@ import { Link, Navigate } from 'react-router-dom'
 import {
   MessageSquare, Shield, Crown, Pill, Lightbulb, ChevronRight,
   Activity, History, CreditCard, Star, Bot, User, AlertTriangle,
-  Calendar, Clock, Sparkles, ArrowUpRight, TrendingUp, Hash,
-  Fingerprint, Mail, BadgeCheck,
+  Calendar, Clock, Sparkles, ArrowUpRight, TrendingUp, Hash,  Fingerprint, Mail, BadgeCheck, Stethoscope, Video, Building2,
+  XCircle,
 } from 'lucide-react'
 import { useAuthStore } from '../store/useAuthStore'
 import { useChatStore } from '../store/useChatStore'
 import { useUserPlan } from '../hooks/useUserPlan'
+import { useAppointments } from '../hooks/useAppointments'
+import { cancelAppointment } from '../services/appointments'
 
-type Tab = 'overview' | 'history' | 'plans' | 'insights' | 'medications'
+type Tab = 'overview' | 'history' | 'appointments' | 'plans' | 'insights' | 'medications'
 
 const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
-  { id: 'overview',    label: 'Overview',       icon: Activity },
-  { id: 'history',     label: 'Chat History',   icon: History },
-  { id: 'plans',       label: 'My Plan',        icon: CreditCard },
-  { id: 'insights',    label: 'AI Insights',    icon: Lightbulb },
-  { id: 'medications', label: 'Medications',    icon: Pill },
+  { id: 'overview',      label: 'Overview',       icon: Activity },
+  { id: 'history',       label: 'Chat History',   icon: History },
+  { id: 'appointments',  label: 'Appointments',   icon: Calendar },
+  { id: 'plans',         label: 'My Plan',        icon: CreditCard },
+  { id: 'insights',      label: 'AI Insights',    icon: Lightbulb },
+  { id: 'medications',   label: 'Medications',    icon: Pill },
 ]
 
 const fadeUp = (delay = 0) => ({
@@ -51,6 +54,7 @@ export default function MyDashboard() {
   const { user } = useAuthStore()
   const { messages } = useChatStore()
   const { plan } = useUserPlan()
+  const { upcoming, completed, cancelled, appointments } = useAppointments()
   const [activeTab, setActiveTab] = useState<Tab>('overview')
   const [mountTime] = useState(() => Date.now())
 
@@ -211,14 +215,13 @@ export default function MyDashboard() {
             {activeTab === 'overview' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 {/* Stats Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-                  {[
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>                  {[
                     { icon: MessageSquare, label: 'Total Messages',   value: String(messages.length), sub: 'All time',       color: '#0ea5e9', gradFrom: '#0ea5e9', gradTo: '#6366f1' },
                     { icon: Bot,           label: 'AI Responses',     value: String(assistantMsgs),     sub: 'Analyzed',       color: '#10b981', gradFrom: '#10b981', gradTo: '#14b8a6' },
                     { icon: User,          label: 'Your Questions',   value: String(userMsgs),          sub: 'Sent',           color: '#8b5cf6', gradFrom: '#8b5cf6', gradTo: '#a855f7' },
-                    { icon: Lightbulb,     label: 'AI Insights',      value: String(recommendations.length), sub: 'Extracted', color: '#f59e0b', gradFrom: '#f59e0b', gradTo: '#f97316' },
+                    { icon: Stethoscope,   label: 'Appointments',     value: String(appointments.length), sub: `${upcoming.length} upcoming`, color: '#06b6d4', gradFrom: '#06b6d4', gradTo: '#0891b2' },
                     { icon: Pill,          label: 'Medications Found', value: String(medications.length), sub: 'Referenced',   color: '#f43f5e', gradFrom: '#f43f5e', gradTo: '#ec4899' },
-                    { icon: Calendar,      label: 'Days Active',      value: String(daysActive),        sub: 'Since signup',   color: '#06b6d4', gradFrom: '#06b6d4', gradTo: '#0ea5e9' },
+                    { icon: Calendar,      label: 'Days Active',      value: String(daysActive),        sub: 'Since signup',   color: '#f59e0b', gradFrom: '#f59e0b', gradTo: '#f97316' },
                   ].map(({ icon: Icon, label, value, sub, color, gradFrom, gradTo }, i) => (
                     <motion.div key={label} {...fadeUp(i * 0.05)} style={{
                       padding: '1.25rem', borderRadius: '1.25rem', position: 'relative', overflow: 'hidden',
@@ -249,10 +252,10 @@ export default function MyDashboard() {
                 {/* Quick Actions */}
                 <motion.div {...fadeUp(0.3)} style={{
                   display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem',
-                }}>
-                  {[
+                }}>                  {[
                     { to: '/chat',     icon: MessageSquare, label: 'Continue AI Chat',   desc: 'Ask health questions',       gradFrom: '#0ea5e9', gradTo: '#6366f1' },
                     { to: '/symptoms', icon: Activity,      label: 'Analyze Symptoms',   desc: 'Check your symptoms',        gradFrom: '#10b981', gradTo: '#14b8a6' },
+                    { to: '/doctors',  icon: Stethoscope,   label: 'Book a Doctor',      desc: 'Consult with specialists',   gradFrom: '#06b6d4', gradTo: '#0891b2' },
                     { to: '/pricing',  icon: Crown,         label: 'Upgrade Plan',        desc: 'Unlock premium features',    gradFrom: '#f59e0b', gradTo: '#ef4444' },
                   ].map(({ to, icon: Icon, label, desc, gradFrom, gradTo }) => (
                     <Link key={to} to={to} style={{ textDecoration: 'none' }}>
@@ -542,6 +545,106 @@ export default function MyDashboard() {
                         <p style={{ fontSize: '0.85rem', color: '#cbd5e1', lineHeight: 1.6 }}>{rec}</p>
                       </motion.div>
                     ))}
+                  </>
+                )}
+              </div>
+            )}            {/* ═══ Appointments ═══ */}
+            {activeTab === 'appointments' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {appointments.length === 0 ? (
+                  <EmptyState icon={Stethoscope} title="No appointments yet" subtitle="Book a consultation with our verified specialists" link="/doctors" linkText="Find a Doctor" />
+                ) : (
+                  <>
+                    {/* Appointment filter pills */}
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
+                      {[
+                        { label: `Upcoming (${upcoming.length})`, color: '#0ea5e9', count: upcoming.length },
+                        { label: `Completed (${completed.length})`, color: '#10b981', count: completed.length },
+                        { label: `Cancelled (${cancelled.length})`, color: '#64748b', count: cancelled.length },
+                      ].map(f => (
+                        <span key={f.label} style={{
+                          padding: '0.35rem 0.875rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600,
+                          background: `${f.color}12`, border: `1px solid ${f.color}30`, color: f.color,
+                        }}>
+                          {f.label}
+                        </span>
+                      ))}
+                    </div>
+
+                    {appointments.map((apt, i) => {
+                      const isUpcoming = apt.status === 'upcoming'
+                      const isCancelled = apt.status === 'cancelled'
+                      const statusColor = isUpcoming ? '#0ea5e9' : isCancelled ? '#64748b' : '#10b981'
+                      const statusLabel = isUpcoming ? 'Upcoming' : isCancelled ? 'Cancelled' : 'Completed'
+
+                      return (
+                        <motion.div key={apt.id} {...fadeUp(i * 0.04)} style={{
+                          padding: '1.25rem', borderRadius: '1.25rem',
+                          background: 'linear-gradient(160deg, #131f35 0%, #0f172a 100%)',
+                          border: `1px solid ${statusColor}25`,
+                          opacity: isCancelled ? 0.6 : 1,
+                        }}>
+                          <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                            <img
+                              src={apt.doctorPhoto}
+                              alt={apt.doctorName}
+                              style={{ width: '3rem', height: '3rem', borderRadius: '0.75rem', border: `2px solid ${statusColor}40`, flexShrink: 0 }}
+                            />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                                <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f1f5f9' }}>{apt.doctorName}</h4>
+                                <span style={{
+                                  padding: '0.2rem 0.625rem', borderRadius: '999px', fontSize: '0.68rem', fontWeight: 600,
+                                  background: `${statusColor}15`, border: `1px solid ${statusColor}30`, color: statusColor,
+                                  flexShrink: 0,
+                                }}>
+                                  {statusLabel}
+                                </span>
+                              </div>
+                              <p style={{ fontSize: '0.8rem', color: '#0ea5e9', fontWeight: 600, marginBottom: '0.5rem' }}>{apt.doctorSpecialty}</p>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', fontSize: '0.78rem', color: '#64748b' }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                  <Calendar style={{ width: '0.75rem', height: '0.75rem' }} />
+                                  {new Date(apt.date + 'T00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                </span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                  <Clock style={{ width: '0.75rem', height: '0.75rem' }} />
+                                  {apt.time}
+                                </span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                  {apt.consultationType === 'video' ? <Video style={{ width: '0.75rem', height: '0.75rem' }} /> : <Building2 style={{ width: '0.75rem', height: '0.75rem' }} />}
+                                  {apt.consultationType === 'video' ? 'Video Call' : 'In-Person'}
+                                </span>
+                                <span style={{ fontWeight: 600, color: '#f1f5f9' }}>${apt.fee}</span>
+                              </div>
+                              {apt.notes && (
+                                <p style={{ fontSize: '0.78rem', color: '#475569', marginTop: '0.5rem', fontStyle: 'italic' }}>
+                                  "{apt.notes}"
+                                </p>
+                              )}
+                              {isUpcoming && (
+                                <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
+                                  <button
+                                    onClick={() => cancelAppointment(apt.id)}
+                                    style={{
+                                      padding: '0.4rem 0.875rem', borderRadius: '0.625rem', fontSize: '0.78rem', fontWeight: 600,
+                                      background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
+                                      color: '#f87171', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem',
+                                      transition: 'all 0.2s',
+                                    }}
+                                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.15)')}
+                                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.08)')}
+                                  >
+                                    <XCircle style={{ width: '0.75rem', height: '0.75rem' }} />
+                                    Cancel
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </motion.div>
+                      )
+                    })}
                   </>
                 )}
               </div>

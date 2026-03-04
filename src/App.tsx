@@ -11,6 +11,7 @@ import PaymentSuccess from './pages/PaymentSuccess'
 import PaymentFail from './pages/PaymentFail'
 import PaymentCancel from './pages/PaymentCancel'
 import MyDashboard from './pages/MyDashboard'
+import Doctors from './pages/Doctors'
 import Login from './pages/Login'
 import './App.css'
 
@@ -45,6 +46,7 @@ function App() {
                 <Routes>
                   <Route path="/"                  element={<Dashboard />} />
                   <Route path="/my-dashboard"      element={<MyDashboard />} />
+                  <Route path="/doctors"           element={<Doctors />} />
                   <Route path="/chat"              element={<Chat />} />
                   <Route path="/symptoms"          element={<SymptomChecker />} />
                   <Route path="/pricing"           element={<Pricing />} />

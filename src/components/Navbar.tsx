@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, Activity, MessageSquare, LayoutDashboard, Menu, X, LogOut, CreditCard, LayoutGrid } from 'lucide-react'
+import { Brain, Activity, MessageSquare, LayoutDashboard, Menu, X, LogOut, CreditCard, LayoutGrid, Stethoscope } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import { useState, useRef, useEffect } from 'react'
 import { signOut } from 'firebase/auth'
@@ -11,6 +11,7 @@ const navItems = [
   { path: '/',        label: 'Home',          icon: LayoutDashboard },
   { path: '/chat',    label: 'AI Assistant',  icon: MessageSquare   },
   { path: '/symptoms',label: 'Symptom Check', icon: Activity        },
+  { path: '/doctors', label: 'Doctors',       icon: Stethoscope     },
   { path: '/pricing', label: 'Pricing',       icon: CreditCard      },
 ]
 
