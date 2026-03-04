@@ -34,31 +34,23 @@ function App() {
   return (
     <BrowserRouter>
       <div className="w-full min-h-screen bg-slate-950">
-        <Routes>
-          {/* Login page — redirect to home if already logged in */}
-          <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
-
-          {/* All other routes are public — Navbar always visible */}
-          <Route path="/*" element={
-            <>
-              <Navbar />
-              <main className="w-full">
-                <Routes>
-                  <Route path="/"                  element={<Dashboard />} />
-                  <Route path="/my-dashboard"      element={<MyDashboard />} />
-                  <Route path="/doctors"           element={<Doctors />} />
-                  <Route path="/chat"              element={<Chat />} />
-                  <Route path="/symptoms"          element={<SymptomChecker />} />
-                  <Route path="/pricing"           element={<Pricing />} />
-                  <Route path="/checkout"          element={<Checkout />} />
-                  <Route path="/payment/success"   element={<PaymentSuccess />} />
-                  <Route path="/payment/fail"      element={<PaymentFail />} />
-                  <Route path="/payment/cancel"    element={<PaymentCancel />} />
-                </Routes>
-              </main>
-            </>
-          } />
-        </Routes>
+        <Navbar />
+        <main className="w-full">
+          <Routes>
+            {/* Login page — redirect to home if already logged in */}
+            <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+            <Route path="/"                  element={<Dashboard />} />
+            <Route path="/my-dashboard"      element={<MyDashboard />} />
+            <Route path="/doctors"           element={<Doctors />} />
+            <Route path="/chat"              element={<Chat />} />
+            <Route path="/symptoms"          element={<SymptomChecker />} />
+            <Route path="/pricing"           element={<Pricing />} />
+            <Route path="/checkout"          element={<Checkout />} />
+            <Route path="/payment/success"   element={<PaymentSuccess />} />
+            <Route path="/payment/fail"      element={<PaymentFail />} />
+            <Route path="/payment/cancel"    element={<PaymentCancel />} />
+          </Routes>
+        </main>
       </div>
     </BrowserRouter>
   )

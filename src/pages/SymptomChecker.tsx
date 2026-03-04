@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Search, AlertTriangle, CheckCircle, Info, Loader2, RotateCcw, Shield, Clock, User, Activity, Sparkles, Lock } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Search, AlertTriangle, CheckCircle, Info, Loader2, RotateCcw, Shield, Clock, User, Activity, Lock } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { Link } from 'react-router-dom'
 import { streamGeminiResponse } from '../services/copilot'
@@ -216,48 +216,23 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
   }
 
   return (
-    <div className="px-4 sm:px-6 md:px-10" style={{ maxWidth: '900px', margin: '0 auto', paddingTop: '2.5rem', paddingBottom: '6rem' }}>
-
-      {/* ── Header ── */}      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '2.5rem' }}>
-        <div className="flex flex-col items-center text-center gap-3 mb-3">
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+    <div className="w-full min-h-[calc(100vh-64px)] flex flex-col items-center justify-start px-4 sm:px-6 md:px-10" style={{ background: 'transparent', paddingTop: '3.5rem', paddingBottom: '4rem' }}>
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '2.5rem', width: '100%' }}>
+        <div className="flex flex-col items-center text-center gap-3 mb-3 w-full">
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 mb-2"
                style={{ background: 'linear-gradient(135deg, #10b981, #0d9488)', boxShadow: '0 0 24px rgba(16,185,129,0.4)' }}>
-            <Shield className="w-6 h-6 text-white" />
+            <Shield className="w-8 h-8 text-white" />
           </div>
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
-              Symptom <span className="bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">Analyzer</span>
-            </h1>            <p className="text-slate-400 text-sm mt-0.5">AI-powered assessment — not a replacement for medical care</p>
-          </div>
-        </div>        {/* Info bar */}
-        <div className="flex flex-wrap justify-center gap-3" style={{ marginTop: '2rem' }}>
-          {[
-            { icon: Sparkles, text: 'AI Powered Analysis' },
-            { icon: Clock, text: 'Results in seconds' },
-            { icon: Shield, text: '24/7 Available' },
-          ].map(({ icon: Icon, text }) => (
-            <div key={text} className="flex items-center gap-1.5 text-xs text-slate-400 bg-slate-800/60 border border-slate-700/50 rounded-full px-3 py-1.5">
-              <Icon className="w-3.5 h-3.5 text-emerald-400" />
-              {text}
-            </div>
-          ))}
+          <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight mb-1">
+            Symptom <span className="bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">Analyzer</span>
+          </h1>
+          <p className="text-slate-400 text-base sm:text-lg max-w-md mx-auto mb-2">Describe your symptoms and get an instant AI-powered health assessment.</p>
         </div>
       </motion.div>
 
-      {/* ── Form Card ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="rounded-3xl"
-        style={{
-          background: 'linear-gradient(160deg, #0f1f35 0%, #0f172a 100%)',
-          border: '1px solid rgba(51,65,85,0.6)',
-          padding: '2rem',
-          display: 'flex', flexDirection: 'column', gap: '2rem',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
-        }}
-      >
+      {/* Form Section */}
+      <div className="w-full max-w-xl bg-slate-900/70 rounded-2xl shadow-lg p-6 sm:p-8 flex flex-col gap-6 mb-8 border border-slate-800">
         {/* Symptom textarea */}
         <div>
           <label className="flex items-center gap-2 text-sm font-semibold text-slate-200 mb-3">
@@ -415,60 +390,28 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
             </p>
           )}
         </div>
-      </motion.div>
+      </div>
 
-      {/* ── Result ── */}
-      <AnimatePresence>
-        {result && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4 }}
-            className="rounded-3xl"
-            style={{
-              marginTop: '2rem',
-              background: 'linear-gradient(160deg, #0f1f35 0%, #0f172a 100%)',
-              border: '1px solid rgba(14,165,233,0.2)',
-              padding: '2rem',
-              display: 'flex', flexDirection: 'column', gap: '1.5rem',
-              boxShadow: '0 20px 60px rgba(14,165,233,0.08)',
-            }}
-          >
-            {/* Result header */}
-            <div className="flex items-start sm:items-center justify-between flex-wrap gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                     style={{ background: 'linear-gradient(135deg, #0ea5e9, #6366f1)' }}>
-                  <Sparkles className="w-4 h-4 text-white" />
-                </div>
-                <h2 className="text-lg font-bold text-white">AI Analysis Result</h2>
+      {/* Result Section */}
+      {result && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-xl mt-2 mb-8">
+          <div className="bg-slate-800/80 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-xl flex flex-col items-center">
+            <UrgencyBadge level={result.urgency} />
+            <div className="mt-4 w-full">
+              <div className="prose prose-invert max-w-none text-slate-200 text-base leading-relaxed">
+                <ReactMarkdown>{result.text}</ReactMarkdown>
               </div>
-              <UrgencyBadge level={result.urgency} />
             </div>
+          </div>
+        </motion.div>
+      )}
 
-            {/* Divider */}
-            <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent, rgba(14,165,233,0.3), transparent)' }} />
-
-            {/* Result content */}
-            <div className="prose prose-invert prose-sm max-w-none prose-headings:text-sky-300 prose-strong:text-white prose-li:text-slate-300 prose-p:text-slate-300 prose-p:leading-relaxed">
-              <ReactMarkdown>{result.text}</ReactMarkdown>
-            </div>
-
-            {/* Divider */}
-            <div style={{ height: '1px', background: 'rgba(51,65,85,0.5)' }} />
-
-            {/* Disclaimer */}
-            <div className="flex items-start gap-3 rounded-2xl p-4" style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)' }}>
-              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-              <p className="text-xs text-slate-400 leading-relaxed">
-                <span className="text-amber-400 font-semibold">Medical Disclaimer: </span>
-                This analysis is AI-generated and for informational purposes only. Always consult a licensed healthcare professional for medical advice, diagnosis, or treatment.
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Reset Button */}
+      {result && (
+        <button onClick={handleReset} className="mt-2 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-md transition-all">
+          Reset
+        </button>
+      )}
     </div>
   )
 }
