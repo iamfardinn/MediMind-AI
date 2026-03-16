@@ -241,15 +241,15 @@ app.post('/api/payments/sslcommerz/ipn', async (req, res) => {
 async function start() {
   await db.initDb()
 
-  app.listen(PORT, () => {
-    console.log(`\n🚀 MediMind backend → http://localhost:${PORT}`)
-    console.log(`   Stripe:     ${stripe ? '✅ ready' : '❌ set STRIPE_SECRET_KEY'}`)
-    console.log(`   SSLCommerz: ${sslEnabled ? '✅ ready' : '⚠️  placeholder credentials (skipped)'}`)
-    console.log(`   PostgreSQL: ✅ connected\n`)
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`\n🚀 MediMind backend running on port ${PORT}`)
+    console.log(`   Stripe:     ${stripe ? '✅ ready' : '❌ missing STRIPE_SECRET_KEY'}`)
+    console.log(`   SSLCommerz: ${sslEnabled ? '✅ ready' : '⚠️ missing config'}`)
   })
 }
 
-start().catch(err => {
+try {
+  start()
+} catch (err) {
   console.error('❌ Server failed to start:', err.message)
-  process.exit(1)
-})
+}
