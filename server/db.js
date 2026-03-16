@@ -9,8 +9,13 @@ const pool = new Pool({
 
 // ── Auto-create tables on first run ──────────────────────────────────────────
 async function initDb() {
-  const client = await pool.connect()
+  if (!process.env.DATABASE_URL) {
+    console.log('⚠️  DATABASE_URL missing. Skipping PostgreSQL connection.')
+    return
+  }
+  
   try {
+    const client = await pool.connect()
     await client.query(`
       CREATE TABLE IF NOT EXISTS payments (
         id            SERIAL PRIMARY KEY,
@@ -51,6 +56,7 @@ async function initDb() {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 async function insertPayment(data) {
+  if (!process.env.DATABASE_URL) return
   try {
     await pool.query(`
       INSERT INTO payments
@@ -71,6 +77,7 @@ async function insertPayment(data) {
 }
 
 async function updatePaymentStatus(tranId, status, extraFields = {}) {
+  if (!process.env.DATABASE_URL) return
   try {
     const { sslValId, rawResponse } = extraFields
     await pool.query(`
@@ -87,6 +94,7 @@ async function updatePaymentStatus(tranId, status, extraFields = {}) {
 }
 
 async function upsertUserPlan(userId, userEmail, planId, billing) {
+  if (!process.env.DATABASE_URL) return
   try {
     await pool.query(`
       INSERT INTO user_plans (user_id, user_email, plan_id, billing, active, started_at, updated_at)
