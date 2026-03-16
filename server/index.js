@@ -10,9 +10,9 @@ const app  = express()
 const PORT = process.env.PORT || 4000
 
 // ── Stripe (graceful if key missing) ─────────────────────────────────────────
-const STRIPE_KEY = process.env.STRIPE_SECRET_KEY || ''
+const STRIPE_KEY = (process.env.STRIPE_SECRET_KEY || '').trim()
 let stripe = null
-if (STRIPE_KEY.startsWith('sk_')) {
+if (STRIPE_KEY && STRIPE_KEY.length > 5) {
   stripe = require('stripe')(STRIPE_KEY)
 }
 
