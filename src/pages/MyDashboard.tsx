@@ -12,6 +12,7 @@ import { useChatStore } from '../store/useChatStore'
 import { useUserPlan } from '../hooks/useUserPlan'
 import { useAppointments } from '../hooks/useAppointments'
 import { cancelAppointment } from '../services/appointments'
+import DeviceSync from '../components/DeviceSync'
 
 type Tab = 'overview' | 'history' | 'appointments' | 'plans' | 'insights' | 'medications'
 
@@ -333,8 +334,12 @@ export default function MyDashboard() {
                         </div>
                       ))}
                     </div>
-                  </motion.div>
-                )}
+                  </motion.div>                )}
+
+                {/* Wearable Integrations */}
+                <motion.div {...fadeUp(0.4)}>
+                  <DeviceSync />
+                </motion.div>
               </div>
             )}
 

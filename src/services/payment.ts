@@ -1,19 +1,4 @@
-/**
- * payment.ts — Payment gateway service
- *
- * ARCHITECTURE NOTE:
- * ─────────────────────────────────────────────────────────────────────────────
- * Both Stripe and SSLCommerz require a backend server to handle secret keys.
- * This file calls YOUR backend API endpoints, which then talk to the gateways.
- *
- * Backend endpoints you need to implement:
- *   POST /api/payments/stripe/create-intent   → calls Stripe to create PaymentIntent
- *   POST /api/payments/sslcommerz/init        → calls SSLCommerz to init transaction
- *   POST /api/payments/verify                 → verify payment after callback
- *
- * For local testing, set VITE_API_URL=http://localhost:4000 in .env.local
- * ─────────────────────────────────────────────────────────────────────────────
- */
+
 
 import { loadStripe } from '@stripe/stripe-js'
 
@@ -50,10 +35,7 @@ export interface SSLCommerzInitResponse {
   sessionKey:  string
 }
 
-/**
- * Calls your backend to create a Stripe PaymentIntent.
- * Your backend uses the Stripe secret key to create it and returns the clientSecret.
- */
+
 export async function createStripeIntent(payload: OrderPayload): Promise<StripeIntentResponse> {
   const res = await fetch(`${API_URL}/api/payments/stripe/create-intent`, {
     method:  'POST',
@@ -64,10 +46,7 @@ export async function createStripeIntent(payload: OrderPayload): Promise<StripeI
   return res.json()
 }
 
-/**
- * Calls your backend to initialise an SSLCommerz transaction.
- * Your backend uses store_passwd to call SSLCommerz and returns the redirect URL.
- */
+
 export async function initSSLCommerz(payload: OrderPayload): Promise<SSLCommerzInitResponse> {
   const res = await fetch(`${API_URL}/api/payments/sslcommerz/init`, {
     method:  'POST',

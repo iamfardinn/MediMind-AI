@@ -2,15 +2,16 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import gsap from 'gsap'
 import CustomCursor from '../components/CustomCursor'
+import ScrollReveal from '../components/ScrollReveal'
+import DeviceSync from '../components/DeviceSync'
 import {
   LineChart, Line, AreaChart, Area, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts'
 import {
   Heart, Thermometer, Wind, Activity, TrendingUp,
-  Brain, Shield, Zap, ArrowUpRight, CalendarDays,
-  Users, UserCheck, UserPlus, Star, Crown, BadgeCheck, MoreHorizontal,
-  TrendingDown, Minus, MessageSquare, Stethoscope, LayoutDashboard, CreditCard,
+  Brain, Shield, Zap,  ArrowUpRight, CalendarDays,
+  Users, UserCheck, UserPlus, Star, Crown, BadgeCheck, MoreHorizontal,  TrendingDown, Minus, MessageSquare, Stethoscope, LayoutDashboard, CreditCard, Sparkles,
 } from 'lucide-react'
 import { useChatStore } from '../store/useChatStore'
 import { Link } from 'react-router-dom'
@@ -315,9 +316,12 @@ function TrendPanel({ vitals }: { vitals: VitalEntry[]; latest: VitalEntry }) {
 
 function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <div style={{ marginBottom: '1.75rem' }}>
-      <h2 className="text-2xl font-semibold text-white">{title}</h2>
-      {subtitle && <p className="text-sm text-slate-500 mt-1.5">{subtitle}</p>}
+    <div style={{ marginBottom: '2rem' }}>
+      <div className="flex items-center gap-3 mb-2">
+        <div style={{ width: '3px', height: '1.5rem', borderRadius: '2px', background: 'linear-gradient(180deg, #0ea5e9, #6366f1)' }} />
+        <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">{title}</h2>
+      </div>
+      {subtitle && <p className="text-sm text-slate-500 ml-5">{subtitle}</p>}
     </div>
   )
 }
@@ -551,12 +555,13 @@ export default function Dashboard() {
             <Icon style={{ width: size, height: size, color, strokeWidth: 1.2 }} />
           </motion.div>
         ))}
-      </div>      <div className="px-4 py-8 sm:px-6 sm:py-10 md:px-10 lg:px-12" style={{ maxWidth: '1280px', margin: '0 auto', paddingBottom: '5rem', position: 'relative', zIndex: 2 }}>
-        {/* PAGE HEADER */}
+      </div>      <div className="px-4 py-8 sm:px-6 sm:py-10 md:px-10 lg:px-12" style={{ maxWidth: '1280px', margin: '0 auto', paddingBottom: '5rem', position: 'relative', zIndex: 2 }}>        {/* PAGE HEADER */}
         <motion.div
-          {...fadeUp(0)}
-          className="flex flex-col items-center text-center gap-4"
-          style={{ marginTop: '1rem', position: 'relative' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          className="flex flex-col items-center text-center gap-5"
+          style={{ marginTop: '2rem', marginBottom: '1rem', position: 'relative' }}
         >
           {/* Pulsing rings behind the title */}
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none' }}>
@@ -570,82 +575,146 @@ export default function Dashboard() {
                   position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
                   width: `${140 + i * 80}px`, height: `${140 + i * 80}px`,
                   borderRadius: '9999px',
-                  border: '1px solid rgba(14,165,233,0.2)',
+                  border: '1px solid rgba(14,165,233,0.15)',
                 }}
               />
             ))}
           </div>
 
+          {/* Badge */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="flex items-center gap-2 text-slate-500 text-sm justify-center"
+            initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium"
+            style={{
+              background: 'rgba(14,165,233,0.08)',
+              border: '1px solid rgba(14,165,233,0.15)',
+              color: '#7dd3fc',
+            }}
           >
-            <CalendarDays className="w-4 h-4 shrink-0" />
+            <Sparkles className="w-3.5 h-3.5" />
+            <CalendarDays className="w-3.5 h-3.5" />
             <span>{today}</span>
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight"
+            initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{ duration: 0.8, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] tracking-tight"
           >
-            MediMind{' '}
-            <span className="bg-linear-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">
-              AI
+            Your Health,{' '}
+            <span className="bg-linear-to-r from-sky-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              Reimagined
             </span>
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.35 }}
-            className="text-slate-400 text-sm lg:text-base"
+            initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{ duration: 0.7, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            className="text-slate-400 text-base sm:text-lg max-w-xl leading-relaxed"
           >
-            Your real-time vitals and AI-powered health overview
+            Real-time vitals monitoring, AI-powered insights, and personalised health intelligence — all in one place.
           </motion.p>
-        </motion.div>
+
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="flex flex-wrap items-center justify-center gap-3 mt-2"
+          >
+            <Link to="/chat">
+              <motion.div
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+                className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white"
+                style={{
+                  background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
+                  boxShadow: '0 4px 24px rgba(14,165,233,0.35)',
+                }}
+              >
+                <Brain className="w-4 h-4" />
+                Start AI Chat
+              </motion.div>
+            </Link>
+            <Link to="/symptoms">
+              <motion.div
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+                className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold"
+                style={{
+                  color: '#94a3b8',
+                  background: 'rgba(30,41,59,0.6)',
+                  border: '1px solid rgba(51,65,85,0.5)',
+                }}
+              >
+                <Shield className="w-4 h-4" />
+                Check Symptoms
+              </motion.div>
+            </Link>
+          </motion.div>
+        </motion.div>{/* Section divider */}
+        <div className="section-divider" />
 
         {/* VITALS GRID */}
-        <section style={{ marginTop: '3.5rem' }}>
-          <SectionHeader title="Current Vitals" subtitle="Updated based on your latest recorded entry" />
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-            <StatCard
-              index={0} icon={Heart} label="Heart Rate"
-              value={latest.heartRate} unit="bpm" sub="Normal"
-              gradientFrom="#f43f5e" gradientTo="#ec4899"
-              glowColor="#f43f5e" trend="up" trendValue="+2 bpm" barPct={72}
-            />
-            <StatCard
-              index={1} icon={Activity} label="Blood Pressure"
-              value={`${latest.bloodPressureSys}/${latest.bloodPressureDia}`} unit="mmHg" sub="Sys / Dia"
-              gradientFrom="#0ea5e9" gradientTo="#3b82f6"
-              glowColor="#0ea5e9" trend="stable" trendValue="No change" barPct={60}
-            />
-            <StatCard
-              index={2} icon={Thermometer} label="Temperature"
-              value={latest.temperature} unit="°F" sub="Normal"
-              gradientFrom="#f59e0b" gradientTo="#f97316"
-              glowColor="#f59e0b" trend="down" trendValue="-0.2°F" barPct={55}
-            />
-            <StatCard
-              index={3} icon={Wind} label="O₂ Saturation"
-              value={latest.oxygenSat} unit="%" sub="SpO₂"
-              gradientFrom="#10b981" gradientTo="#14b8a6"
-              glowColor="#10b981" trend="up" trendValue="+1%" barPct={98}
-            />
-          </div>        </section>
+        <ScrollReveal direction="up" delay={0}>
+          <section>
+            <SectionHeader title="Current Vitals" subtitle="Updated based on your latest recorded entry" />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+              <ScrollReveal direction="up" delay={0.05}><StatCard
+                index={0} icon={Heart} label="Heart Rate"
+                value={latest.heartRate} unit="bpm" sub="Normal"
+                gradientFrom="#f43f5e" gradientTo="#ec4899"
+                glowColor="#f43f5e" trend="up" trendValue="+2 bpm" barPct={72}
+              /></ScrollReveal>
+              <ScrollReveal direction="up" delay={0.12}><StatCard
+                index={1} icon={Activity} label="Blood Pressure"
+                value={`${latest.bloodPressureSys}/${latest.bloodPressureDia}`} unit="mmHg" sub="Sys / Dia"
+                gradientFrom="#0ea5e9" gradientTo="#3b82f6"
+                glowColor="#0ea5e9" trend="stable" trendValue="No change" barPct={60}
+              /></ScrollReveal>
+              <ScrollReveal direction="up" delay={0.19}><StatCard
+                index={2} icon={Thermometer} label="Temperature"
+                value={latest.temperature} unit="°F" sub="Normal"
+                gradientFrom="#f59e0b" gradientTo="#f97316"
+                glowColor="#f59e0b" trend="down" trendValue="-0.2°F" barPct={55}
+              /></ScrollReveal>
+              <ScrollReveal direction="up" delay={0.26}><StatCard
+                index={3} icon={Wind} label="O₂ Saturation"
+                value={latest.oxygenSat} unit="%" sub="SpO₂"
+                gradientFrom="#10b981" gradientTo="#14b8a6"
+                glowColor="#10b981" trend="up" trendValue="+1%" barPct={98}
+              /></ScrollReveal>
+            </div>
+          </section>
+        </ScrollReveal>
+
+        <div className="section-divider" />
 
         {/* CHARTS */}
-        <section style={{ marginTop: '3.5rem' }}>
-          <SectionHeader title="Trends Over Time" subtitle="6-month historical health data" />
-          <TrendPanel vitals={vitals} latest={latest} />        </section>
+        <ScrollReveal direction="scale" delay={0.1}>
+          <section>
+            <SectionHeader title="Trends Over Time" subtitle="6-month historical health data" />
+            <TrendPanel vitals={vitals} latest={latest} />
+          </section>
+        </ScrollReveal>
+
+        <div className="section-divider" />
+
+        {/* DEVICE SYNC FEATURE */}
+        <ScrollReveal direction="up" delay={0.1}>
+          <DeviceSync />
+        </ScrollReveal>
+
+        <div className="section-divider" />
 
         {/* AI TOOLS */}
-        <section style={{ marginTop: '3.5rem', paddingBottom: '1rem' }}>
-          <SectionHeader title="AI Tools" subtitle="Powered by GitHub Copilot — real-time intelligence" />          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <ScrollReveal direction="up" delay={0}>
+          <section style={{ paddingBottom: '1rem' }}>
+            <SectionHeader title="AI Tools" subtitle="Powered by GitHub Copilot — real-time intelligence" /><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* ── Card 1: AI Medical Assistant ── */}
             <MagneticCard
               glowColor="#0ea5e9"
@@ -782,12 +851,15 @@ export default function Dashboard() {
               <Link to="/" className="flex items-center justify-center gap-2 rounded-xl text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
                 style={{ padding: '0.75rem', background: 'linear-gradient(135deg, #f59e0b, #f97316)', boxShadow: '0 4px 20px rgba(245,158,11,0.3)' }}>
                 View Trends <ArrowUpRight className="w-4 h-4" />              </Link>
-            </MagneticCard>
+            </MagneticCard>          </div>
+          </section>
+        </ScrollReveal>
 
-          </div>        </section>
+        <div className="section-divider" />
 
         {/* CLIENTS */}
-        <section style={{ marginTop: '3.5rem' }}>
+        <ScrollReveal direction="up" delay={0}>
+          <section>
           <SectionHeader title="Clients" subtitle="Active patients and their current health plans" />
 
           {/* Client stat pills */}
@@ -878,10 +950,15 @@ export default function Dashboard() {
                   ))}
                 </tbody>
               </table>
-            </div>
-          </motion.div>
-        </section>        {/* PREMIUM REVIEWS */}
-        <section style={{ marginTop: '3.5rem', paddingBottom: '2rem' }}>
+            </div>          </motion.div>
+        </section>
+        </ScrollReveal>
+
+        <div className="section-divider" />
+
+        {/* PREMIUM REVIEWS */}
+        <ScrollReveal direction="up" delay={0}>
+        <section style={{ paddingBottom: '2rem' }}>
           <SectionHeader title="Premium Client Reviews" subtitle="What our top-tier members are saying" />
 
           {/* Review cards */}
@@ -969,9 +1046,9 @@ export default function Dashboard() {
               <p className="text-slate-500 text-xs text-center max-w-32">
                 All reviews from active premium members
               </p>
-            </div>
-          </motion.div>
+            </div>          </motion.div>
         </section>
+        </ScrollReveal>
 
       </div>
     </div>
