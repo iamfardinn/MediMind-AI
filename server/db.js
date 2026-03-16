@@ -14,8 +14,9 @@ async function initDb() {
     return
   }
   
+  let client
   try {
-    const client = await pool.connect()
+    client = await pool.connect()
     await client.query(`
       CREATE TABLE IF NOT EXISTS payments (
         id            SERIAL PRIMARY KEY,
@@ -50,7 +51,7 @@ async function initDb() {
   } catch (err) {
     console.error('⚠️  PostgreSQL init error (payments will still work without DB):', err.message)
   } finally {
-    client.release()
+    if (client) client.release()
   }
 }
 
