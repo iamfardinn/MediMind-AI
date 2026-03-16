@@ -19,7 +19,7 @@
 
 CREATE TABLE IF NOT EXISTS chat_messages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id TEXT NOT NULL,
+  user_id UUID NOT NULL,
   role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
   content TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -45,7 +45,7 @@ COMMENT ON COLUMN chat_messages.content IS 'The actual message content/text';
 
 CREATE TABLE IF NOT EXISTS user_vitals (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id TEXT NOT NULL,
+  user_id UUID NOT NULL,
   date TEXT NOT NULL,
   heart_rate INTEGER CHECK (heart_rate >= 0 AND heart_rate <= 300),
   blood_pressure_sys INTEGER CHECK (blood_pressure_sys >= 0 AND blood_pressure_sys <= 300),
@@ -78,7 +78,7 @@ COMMENT ON COLUMN user_vitals.oxygen_sat IS 'Blood oxygen saturation percentage 
 -- =============================================================================
 
 CREATE TABLE IF NOT EXISTS user_profiles (
-  id TEXT PRIMARY KEY,
+  id UUID PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
   display_name TEXT,
   avatar_url TEXT,
