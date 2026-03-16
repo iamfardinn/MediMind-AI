@@ -273,7 +273,7 @@ function SyncCard({
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function DeviceSync() {
-  const { addVital, vitals } = useChatStore()
+  const { addVital } = useChatStore()
   const [connecting, setConnecting] = useState<'apple' | 'google' | null>(null)
   const [connected, setConnected] = useState<{ apple?: boolean; google?: boolean }>({})
   const [syncStatus, setSyncStatus] = useState('')
