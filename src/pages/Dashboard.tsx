@@ -10,19 +10,19 @@ import {
 } from 'recharts'
 import {
   Heart, Thermometer, Wind, Activity, TrendingUp,
-  Brain, Shield, Zap,  ArrowUpRight, CalendarDays,
-  Users, UserCheck, UserPlus, Star, Crown, BadgeCheck, MoreHorizontal,  TrendingDown, Minus, MessageSquare, Stethoscope, LayoutDashboard, CreditCard, Sparkles,
+  Brain, Shield, Zap, ArrowUpRight, CalendarDays,
+  Users, UserCheck, UserPlus, Star, Crown, BadgeCheck, MoreHorizontal, TrendingDown, Minus, MessageSquare, Stethoscope, LayoutDashboard, CreditCard, Sparkles,
 } from 'lucide-react'
 import { useChatStore } from '../store/useChatStore'
 import { Link } from 'react-router-dom'
 
 const CLIENTS = [
-  { name: 'Sarah Johnson',    age: 34, plan: 'Premium',  status: 'Active',   lastVisit: 'Feb 25, 2026', condition: 'Hypertension',    avatar: 'SJ', avatarColor: 'bg-rose-500' },
-  { name: 'Michael Torres',   age: 52, plan: 'Premium',  status: 'Active',   lastVisit: 'Feb 27, 2026', condition: 'Diabetes T2',     avatar: 'MT', avatarColor: 'bg-sky-500' },
-  { name: 'Aisha Patel',      age: 28, plan: 'Standard', status: 'Active',   lastVisit: 'Feb 20, 2026', condition: 'Anxiety',         avatar: 'AP', avatarColor: 'bg-emerald-500' },
-  { name: 'David Kim',        age: 61, plan: 'Premium',  status: 'Review',   lastVisit: 'Feb 15, 2026', condition: 'Cardiac Monitor', avatar: 'DK', avatarColor: 'bg-amber-500' },
-  { name: 'Elena Vasquez',    age: 45, plan: 'Standard', status: 'Active',   lastVisit: 'Feb 26, 2026', condition: 'Migraine',        avatar: 'EV', avatarColor: 'bg-purple-500' },
-  { name: 'James Okafor',     age: 39, plan: 'Premium',  status: 'Inactive', lastVisit: 'Jan 30, 2026', condition: 'Asthma',          avatar: 'JO', avatarColor: 'bg-teal-500' },
+  { name: 'Sarah Johnson', age: 34, plan: 'Premium', status: 'Active', lastVisit: 'Feb 25, 2026', condition: 'Hypertension', avatar: 'SJ', avatarColor: 'bg-rose-500' },
+  { name: 'Michael Torres', age: 52, plan: 'Premium', status: 'Active', lastVisit: 'Feb 27, 2026', condition: 'Diabetes T2', avatar: 'MT', avatarColor: 'bg-sky-500' },
+  { name: 'Aisha Patel', age: 28, plan: 'Standard', status: 'Active', lastVisit: 'Feb 20, 2026', condition: 'Anxiety', avatar: 'AP', avatarColor: 'bg-emerald-500' },
+  { name: 'David Kim', age: 61, plan: 'Premium', status: 'Review', lastVisit: 'Feb 15, 2026', condition: 'Cardiac Monitor', avatar: 'DK', avatarColor: 'bg-amber-500' },
+  { name: 'Elena Vasquez', age: 45, plan: 'Standard', status: 'Active', lastVisit: 'Feb 26, 2026', condition: 'Migraine', avatar: 'EV', avatarColor: 'bg-purple-500' },
+  { name: 'James Okafor', age: 39, plan: 'Premium', status: 'Inactive', lastVisit: 'Jan 30, 2026', condition: 'Asthma', avatar: 'JO', avatarColor: 'bg-teal-500' },
 ]
 
 const REVIEWS = [
@@ -65,7 +65,7 @@ function StatCard({
   trend: 'up' | 'down' | 'stable'
   trendValue: string
   barPct: number
-}){
+}) {
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus
   const trendColor = trend === 'up' ? '#34d399' : trend === 'down' ? '#f87171' : '#94a3b8'
   return (
@@ -138,10 +138,10 @@ function StatCard({
 // ─── Trend Panel ──────────────────────────────────────────────────────────────
 
 const TABS = [
-  { key: 'heartRate',      label: 'Heart Rate',    unit: 'bpm',  color: '#f43f5e', gradFrom: '#f43f5e', gradTo: '#ec4899' },
-  { key: 'bloodPressure',  label: 'Blood Pressure',unit: 'mmHg', color: '#0ea5e9', gradFrom: '#0ea5e9', gradTo: '#6366f1' },
-  { key: 'temperature',    label: 'Temperature',   unit: '°F',   color: '#f59e0b', gradFrom: '#f59e0b', gradTo: '#f97316' },
-  { key: 'oxygenSat',      label: 'O₂ Saturation', unit: '%',    color: '#10b981', gradFrom: '#10b981', gradTo: '#14b8a6' },
+  { key: 'heartRate', label: 'Heart Rate', unit: 'bpm', color: '#f43f5e', gradFrom: '#f43f5e', gradTo: '#ec4899' },
+  { key: 'bloodPressure', label: 'Blood Pressure', unit: 'mmHg', color: '#0ea5e9', gradFrom: '#0ea5e9', gradTo: '#6366f1' },
+  { key: 'temperature', label: 'Temperature', unit: '°F', color: '#f59e0b', gradFrom: '#f59e0b', gradTo: '#f97316' },
+  { key: 'oxygenSat', label: 'O₂ Saturation', unit: '%', color: '#10b981', gradFrom: '#10b981', gradTo: '#14b8a6' },
 ] as const
 
 type TabKey = typeof TABS[number]['key']
@@ -183,12 +183,12 @@ function TrendPanel({ vitals }: { vitals: VitalEntry[]; latest: VitalEntry }) {
 
   /* Build chart data — for blood pressure we show both lines */
   const chartData = vitals.map(v => ({
-    date:  v.date,
+    date: v.date,
     heartRate: v.heartRate,
-    sys:   v.bloodPressureSys,
-    dia:   v.bloodPressureDia,
+    sys: v.bloodPressureSys,
+    dia: v.bloodPressureDia,
     temperature: v.temperature,
-    oxygenSat:   v.oxygenSat,
+    oxygenSat: v.oxygenSat,
   }))
 
   /* Stat summary for active tab */
@@ -241,8 +241,8 @@ function TrendPanel({ vitals }: { vitals: VitalEntry[]; latest: VitalEntry }) {
         <div className="flex flex-wrap items-center gap-3 mb-5">
           {[
             { label: 'Average', value: avgVal },
-            { label: 'Min',     value: minVal },
-            { label: 'Max',     value: maxVal },
+            { label: 'Min', value: minVal },
+            { label: 'Max', value: maxVal },
           ].map(s => (
             <div key={s.label} style={{ background: `${tab.color}10`, border: `1px solid ${tab.color}25`, borderRadius: '0.875rem', padding: '0.6rem 1rem' }}>
               <span style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' as const, display: 'block' }}>{s.label}</span>
@@ -276,19 +276,19 @@ function TrendPanel({ vitals }: { vitals: VitalEntry[]; latest: VitalEntry }) {
                 <XAxis dataKey="date" tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} />                <Tooltip content={(props) => <ChartTooltip {...props} unit={tab.unit} accentColor={tab.color} />} />
                 <Legend wrapperStyle={{ fontSize: '0.75rem', color: '#94a3b8', paddingTop: '1rem' }} />
-                <Line type="monotone" dataKey="sys"name="Systolic" stroke="url(#bpSys)" strokeWidth={2.5} dot={false} activeDot={{ r: 5, fill: '#0ea5e9' }} />
+                <Line type="monotone" dataKey="sys" name="Systolic" stroke="url(#bpSys)" strokeWidth={2.5} dot={false} activeDot={{ r: 5, fill: '#0ea5e9' }} />
                 <Line type="monotone" dataKey="dia" name="Diastolic" stroke="url(#bpDia)" strokeWidth={2} strokeDasharray="5 3" dot={false} activeDot={{ r: 5, fill: '#6366f1' }} />
               </LineChart>
             ) : (
               <AreaChart data={chartData} margin={{ top: 8, right: 16, left: -18, bottom: 0 }}>
                 <defs>
                   <linearGradient id={`grad-${activeTab}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%"   stopColor={tab.color} stopOpacity={0.35} />
-                    <stop offset="100%" stopColor={tab.color} stopOpacity={0}    />
+                    <stop offset="0%" stopColor={tab.color} stopOpacity={0.35} />
+                    <stop offset="100%" stopColor={tab.color} stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id={`line-${activeTab}`} x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%"   stopColor={tab.gradFrom} />
-                    <stop offset="100%" stopColor={tab.gradTo}   />
+                    <stop offset="0%" stopColor={tab.gradFrom} />
+                    <stop offset="100%" stopColor={tab.gradTo} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(51,65,85,0.4)" vertical={false} />
@@ -330,11 +330,11 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }
 
 // ─── Floating Side Tabs ───────────────────────────────────────────────────────
 const SIDE_TABS = [
-  { icon: MessageSquare,  label: 'AI Chat',       to: '/chat',        color: '#0ea5e9', glow: 'rgba(14,165,233,0.4)' },
-  { icon: Stethoscope,    label: 'Doctors',        to: '/doctors',     color: '#8b5cf6', glow: 'rgba(139,92,246,0.4)' },
-  { icon: Shield,         label: 'Symptoms',       to: '/symptoms',    color: '#10b981', glow: 'rgba(16,185,129,0.4)' },
-  { icon: LayoutDashboard,label: 'Dashboard',      to: '/my-dashboard',color: '#f59e0b', glow: 'rgba(245,158,11,0.4)' },
-  { icon: CreditCard,     label: 'Pricing',        to: '/pricing',     color: '#ec4899', glow: 'rgba(236,72,153,0.4)' },
+  { icon: MessageSquare, label: 'AI Chat', to: '/chat', color: '#0ea5e9', glow: 'rgba(14,165,233,0.4)' },
+  { icon: Stethoscope, label: 'Doctors', to: '/doctors', color: '#8b5cf6', glow: 'rgba(139,92,246,0.4)' },
+  { icon: Shield, label: 'Symptoms', to: '/symptoms', color: '#10b981', glow: 'rgba(16,185,129,0.4)' },
+  { icon: LayoutDashboard, label: 'Dashboard', to: '/my-dashboard', color: '#f59e0b', glow: 'rgba(245,158,11,0.4)' },
+  { icon: CreditCard, label: 'Pricing', to: '/pricing', color: '#ec4899', glow: 'rgba(236,72,153,0.4)' },
 ]
 
 function FloatingSideTabs() {
@@ -355,7 +355,7 @@ function FloatingSideTabs() {
           initial={{ x: 80, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 80, opacity: 0 }}
-          transition={{ type: 'spring', stiffness: 260, damping: 24 }}          style={{
+          transition={{ type: 'spring', stiffness: 260, damping: 24 }} style={{
             position: 'fixed', right: '1rem', top: 0, bottom: 0,
             display: 'flex', flexDirection: 'column', gap: '0.5rem', zIndex: 50,
             justifyContent: 'center',
@@ -530,9 +530,9 @@ export default function Dashboard() {
       {/* Animated floating background icons */}
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '500px', overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
         {[
-          { Icon: Heart, x: '10%', y: '15%', size: 28, delay: 0,   color: 'rgba(244,63,94,0.08)' },
+          { Icon: Heart, x: '10%', y: '15%', size: 28, delay: 0, color: 'rgba(244,63,94,0.08)' },
           { Icon: Brain, x: '85%', y: '20%', size: 32, delay: 0.5, color: 'rgba(14,165,233,0.08)' },
-          { Icon: Shield, x: '75%', y: '60%', size: 24, delay: 1,   color: 'rgba(16,185,129,0.07)' },
+          { Icon: Shield, x: '75%', y: '60%', size: 24, delay: 1, color: 'rgba(16,185,129,0.07)' },
           { Icon: Activity, x: '20%', y: '70%', size: 26, delay: 1.5, color: 'rgba(99,102,241,0.08)' },
           { Icon: Zap, x: '50%', y: '25%', size: 20, delay: 0.8, color: 'rgba(245,158,11,0.07)' },
           { Icon: Thermometer, x: '35%', y: '55%', size: 22, delay: 1.2, color: 'rgba(249,115,22,0.07)' },
@@ -715,143 +715,143 @@ export default function Dashboard() {
         <ScrollReveal direction="up" delay={0}>
           <section style={{ paddingBottom: '1rem' }}>
             <SectionHeader title="AI Tools" subtitle="Powered by GitHub Copilot — real-time intelligence" /><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {/* ── Card 1: AI Medical Assistant ── */}
-            <MagneticCard
-              glowColor="#0ea5e9"
-              className="relative overflow-hidden rounded-3xl flex flex-col"
-              style={{ background: 'linear-gradient(145deg, #0c1a2e 0%, #0f172a 60%, #0c1929 100%)', border: '1px solid rgba(14,165,233,0.2)', padding: '2rem' }}
-            >
-              {/* Decorative blob */}
-              <div style={{ position: 'absolute', top: '-3rem', right: '-3rem', width: '10rem', height: '10rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(14,165,233,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
-              <div style={{ position: 'absolute', bottom: '-2rem', left: '-2rem', width: '8rem', height: '8rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
+              {/* ── Card 1: AI Medical Assistant ── */}
+              <MagneticCard
+                glowColor="#0ea5e9"
+                className="relative overflow-hidden rounded-3xl flex flex-col"
+                style={{ background: 'linear-gradient(145deg, #0c1a2e 0%, #0f172a 60%, #0c1929 100%)', border: '1px solid rgba(14,165,233,0.2)', padding: '2rem' }}
+              >
+                {/* Decorative blob */}
+                <div style={{ position: 'absolute', top: '-3rem', right: '-3rem', width: '10rem', height: '10rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(14,165,233,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', bottom: '-2rem', left: '-2rem', width: '8rem', height: '8rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-              {/* Top badge */}
-              <div className="flex items-center justify-between" style={{ marginBottom: '1.5rem' }}>
-                <span className="text-xs font-semibold text-sky-400 bg-sky-500/10 border border-sky-500/20 rounded-full" style={{ padding: '0.3rem 0.8rem' }}>Most Used</span>
-                <span className="text-xs text-slate-500">Gemini 2.0</span>
-              </div>
+                {/* Top badge */}
+                <div className="flex items-center justify-between" style={{ marginBottom: '1.5rem' }}>
+                  <span className="text-xs font-semibold text-sky-400 bg-sky-500/10 border border-sky-500/20 rounded-full" style={{ padding: '0.3rem 0.8rem' }}>Most Used</span>
+                  <span className="text-xs text-slate-500">Gemini 2.0</span>
+                </div>
 
-              {/* Icon */}
-              <div style={{ width: '3.5rem', height: '3.5rem', borderRadius: '1rem', background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem', boxShadow: '0 0 24px rgba(14,165,233,0.4)' }}>
-                <Brain className="w-7 h-7 text-white" />
-              </div>
+                {/* Icon */}
+                <div style={{ width: '3.5rem', height: '3.5rem', borderRadius: '1rem', background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem', boxShadow: '0 0 24px rgba(14,165,233,0.4)' }}>
+                  <Brain className="w-7 h-7 text-white" />
+                </div>
 
-              <h3 className="text-lg font-bold text-white" style={{ marginBottom: '0.6rem' }}>AI Medical Assistant</h3>
-              <p className="text-slate-400 text-sm leading-relaxed" style={{ marginBottom: '1.5rem' }}>
-                Real-time conversation with your personal AI doctor. Evidence-based guidance on any health concern, 24/7.
-              </p>
+                <h3 className="text-lg font-bold text-white" style={{ marginBottom: '0.6rem' }}>AI Medical Assistant</h3>
+                <p className="text-slate-400 text-sm leading-relaxed" style={{ marginBottom: '1.5rem' }}>
+                  Real-time conversation with your personal AI doctor. Evidence-based guidance on any health concern, 24/7.
+                </p>
 
-              {/* Feature list */}
-              <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.75rem' }}>
-                {['Instant symptom triage', 'Drug interaction checks', 'Personalised health tips'].map(f => (
-                  <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
-                    <span style={{ width: '1.25rem', height: '1.25rem', borderRadius: '9999px', background: 'rgba(14,165,233,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
+                {/* Feature list */}
+                <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.75rem' }}>
+                  {['Instant symptom triage', 'Drug interaction checks', 'Personalised health tips'].map(f => (
+                    <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
+                      <span style={{ width: '1.25rem', height: '1.25rem', borderRadius: '9999px', background: 'rgba(14,165,233,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                      </span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
 
-              {/* Stat */}
-              <div className="flex items-center gap-2 border-t border-slate-700/40" style={{ paddingTop: '1.25rem', marginBottom: '1.25rem' }}>
-                <span className="text-2xl font-bold text-white">98%</span>
-                <span className="text-xs text-slate-400">user satisfaction rate</span>
-              </div>
+                {/* Stat */}
+                <div className="flex items-center gap-2 border-t border-slate-700/40" style={{ paddingTop: '1.25rem', marginBottom: '1.25rem' }}>
+                  <span className="text-2xl font-bold text-white">98%</span>
+                  <span className="text-xs text-slate-400">user satisfaction rate</span>
+                </div>
 
-              {/* CTA */}
-              <Link to="/chat" className="flex items-center justify-center gap-2 rounded-xl text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
-                style={{ padding: '0.75rem', background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', boxShadow: '0 4px 20px rgba(14,165,233,0.3)' }}>
-                Start Chatting <ArrowUpRight className="w-4 h-4" />              </Link>
-            </MagneticCard>
+                {/* CTA */}
+                <Link to="/chat" className="flex items-center justify-center gap-2 rounded-xl text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
+                  style={{ padding: '0.75rem', background: 'linear-gradient(135deg, #0ea5e9, #6366f1)', boxShadow: '0 4px 20px rgba(14,165,233,0.3)' }}>
+                  Start Chatting <ArrowUpRight className="w-4 h-4" />              </Link>
+              </MagneticCard>
 
-            {/* ── Card 2: Symptom Analyzer ── */}
-            <MagneticCard
-              glowColor="#10b981"
-              className="relative overflow-hidden rounded-3xl flex flex-col"
-              style={{ background: 'linear-gradient(145deg, #0a1f18 0%, #0f172a 60%, #0a1a14 100%)', border: '1px solid rgba(16,185,129,0.2)', padding: '2rem' }}
-            >
-              <div style={{ position: 'absolute', top: '-3rem', right: '-3rem', width: '10rem', height: '10rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(16,185,129,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
-              <div style={{ position: 'absolute', bottom: '-2rem', left: '-2rem', width: '8rem', height: '8rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(20,184,166,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
+              {/* ── Card 2: Symptom Analyzer ── */}
+              <MagneticCard
+                glowColor="#10b981"
+                className="relative overflow-hidden rounded-3xl flex flex-col"
+                style={{ background: 'linear-gradient(145deg, #0a1f18 0%, #0f172a 60%, #0a1a14 100%)', border: '1px solid rgba(16,185,129,0.2)', padding: '2rem' }}
+              >
+                <div style={{ position: 'absolute', top: '-3rem', right: '-3rem', width: '10rem', height: '10rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(16,185,129,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', bottom: '-2rem', left: '-2rem', width: '8rem', height: '8rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(20,184,166,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-              <div className="flex items-center justify-between" style={{ marginBottom: '1.5rem' }}>
-                <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-full" style={{ padding: '0.3rem 0.8rem' }}>AI Powered</span>
-                <span className="text-xs text-slate-500">Instant Results</span>
-              </div>
+                <div className="flex items-center justify-between" style={{ marginBottom: '1.5rem' }}>
+                  <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-full" style={{ padding: '0.3rem 0.8rem' }}>AI Powered</span>
+                  <span className="text-xs text-slate-500">Instant Results</span>
+                </div>
 
-              <div style={{ width: '3.5rem', height: '3.5rem', borderRadius: '1rem', background: 'linear-gradient(135deg, #10b981, #14b8a6)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem', boxShadow: '0 0 24px rgba(16,185,129,0.4)' }}>
-                <Shield className="w-7 h-7 text-white" />
-              </div>
+                <div style={{ width: '3.5rem', height: '3.5rem', borderRadius: '1rem', background: 'linear-gradient(135deg, #10b981, #14b8a6)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem', boxShadow: '0 0 24px rgba(16,185,129,0.4)' }}>
+                  <Shield className="w-7 h-7 text-white" />
+                </div>
 
-              <h3 className="text-lg font-bold text-white" style={{ marginBottom: '0.6rem' }}>Symptom Analyzer</h3>
-              <p className="text-slate-400 text-sm leading-relaxed" style={{ marginBottom: '1.5rem' }}>
-                Describe symptoms in plain language. Get a detailed AI assessment with urgency level and clear next steps.
-              </p>
+                <h3 className="text-lg font-bold text-white" style={{ marginBottom: '0.6rem' }}>Symptom Analyzer</h3>
+                <p className="text-slate-400 text-sm leading-relaxed" style={{ marginBottom: '1.5rem' }}>
+                  Describe symptoms in plain language. Get a detailed AI assessment with urgency level and clear next steps.
+                </p>
 
-              <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.75rem' }}>
-                {['Urgency classification', 'Condition probability', 'Action plan & next steps'].map(f => (
-                  <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
-                    <span style={{ width: '1.25rem', height: '1.25rem', borderRadius: '9999px', background: 'rgba(16,185,129,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#34d399" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
+                <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.75rem' }}>
+                  {['Urgency classification', 'Condition probability', 'Action plan & next steps'].map(f => (
+                    <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
+                      <span style={{ width: '1.25rem', height: '1.25rem', borderRadius: '9999px', background: 'rgba(16,185,129,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#34d399" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                      </span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
 
-              <div className="flex items-center gap-2 border-t border-slate-700/40" style={{ paddingTop: '1.25rem', marginBottom: '1.25rem' }}>
-                <span className="text-2xl font-bold text-white">2.4s</span>
-                <span className="text-xs text-slate-400">average analysis time</span>
-              </div>
+                <div className="flex items-center gap-2 border-t border-slate-700/40" style={{ paddingTop: '1.25rem', marginBottom: '1.25rem' }}>
+                  <span className="text-2xl font-bold text-white">2.4s</span>
+                  <span className="text-xs text-slate-400">average analysis time</span>
+                </div>
 
-              <Link to="/symptoms" className="flex items-center justify-center gap-2 rounded-xl text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
-                style={{ padding: '0.75rem', background: 'linear-gradient(135deg, #10b981, #14b8a6)', boxShadow: '0 4px 20px rgba(16,185,129,0.3)' }}>
-                Analyze Symptoms <ArrowUpRight className="w-4 h-4" />              </Link>
-            </MagneticCard>
+                <Link to="/symptoms" className="flex items-center justify-center gap-2 rounded-xl text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
+                  style={{ padding: '0.75rem', background: 'linear-gradient(135deg, #10b981, #14b8a6)', boxShadow: '0 4px 20px rgba(16,185,129,0.3)' }}>
+                  Analyze Symptoms <ArrowUpRight className="w-4 h-4" />              </Link>
+              </MagneticCard>
 
-            {/* ── Card 3: Real-Time Insights ── */}
-            <MagneticCard
-              glowColor="#f59e0b"
-              className="relative overflow-hidden rounded-3xl flex flex-col"
-              style={{ background: 'linear-gradient(145deg, #1a1200 0%, #0f172a 60%, #1a1200 100%)', border: '1px solid rgba(245,158,11,0.2)', padding: '2rem' }}
-            >
-              <div style={{ position: 'absolute', top: '-3rem', right: '-3rem', width: '10rem', height: '10rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(245,158,11,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
-              <div style={{ position: 'absolute', bottom: '-2rem', left: '-2rem', width: '8rem', height: '8rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(249,115,22,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
+              {/* ── Card 3: Real-Time Insights ── */}
+              <MagneticCard
+                glowColor="#f59e0b"
+                className="relative overflow-hidden rounded-3xl flex flex-col"
+                style={{ background: 'linear-gradient(145deg, #1a1200 0%, #0f172a 60%, #1a1200 100%)', border: '1px solid rgba(245,158,11,0.2)', padding: '2rem' }}
+              >
+                <div style={{ position: 'absolute', top: '-3rem', right: '-3rem', width: '10rem', height: '10rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(245,158,11,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', bottom: '-2rem', left: '-2rem', width: '8rem', height: '8rem', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(249,115,22,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-              <div className="flex items-center justify-between" style={{ marginBottom: '1.5rem' }}>
-                <span className="text-xs font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full" style={{ padding: '0.3rem 0.8rem' }}>Live Data</span>
-                <span className="text-xs text-slate-500">Auto-updated</span>
-              </div>
+                <div className="flex items-center justify-between" style={{ marginBottom: '1.5rem' }}>
+                  <span className="text-xs font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full" style={{ padding: '0.3rem 0.8rem' }}>Live Data</span>
+                  <span className="text-xs text-slate-500">Auto-updated</span>
+                </div>
 
-              <div style={{ width: '3.5rem', height: '3.5rem', borderRadius: '1rem', background: 'linear-gradient(135deg, #f59e0b, #f97316)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem', boxShadow: '0 0 24px rgba(245,158,11,0.4)' }}>
-                <Zap className="w-7 h-7 text-white" />
-              </div>
+                <div style={{ width: '3.5rem', height: '3.5rem', borderRadius: '1rem', background: 'linear-gradient(135deg, #f59e0b, #f97316)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem', boxShadow: '0 0 24px rgba(245,158,11,0.4)' }}>
+                  <Zap className="w-7 h-7 text-white" />
+                </div>
 
-              <h3 className="text-lg font-bold text-white" style={{ marginBottom: '0.6rem' }}>Real-Time Insights</h3>
-              <p className="text-slate-400 text-sm leading-relaxed" style={{ marginBottom: '1.5rem' }}>
-                Track vitals over time, spot trends early, and receive AI-driven alerts before small issues become serious.
-              </p>
+                <h3 className="text-lg font-bold text-white" style={{ marginBottom: '0.6rem' }}>Real-Time Insights</h3>
+                <p className="text-slate-400 text-sm leading-relaxed" style={{ marginBottom: '1.5rem' }}>
+                  Track vitals over time, spot trends early, and receive AI-driven alerts before small issues become serious.
+                </p>
 
-              <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.75rem' }}>
-                {['6-month trend charts', 'Smart anomaly alerts', 'Predictive health scoring'].map(f => (
-                  <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
-                    <span style={{ width: '1.25rem', height: '1.25rem', borderRadius: '9999px', background: 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
+                <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.75rem' }}>
+                  {['6-month trend charts', 'Smart anomaly alerts', 'Predictive health scoring'].map(f => (
+                    <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
+                      <span style={{ width: '1.25rem', height: '1.25rem', borderRadius: '9999px', background: 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                      </span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
 
-              <div className="flex items-center gap-2 border-t border-slate-700/40" style={{ paddingTop: '1.25rem', marginBottom: '1.25rem' }}>
-                <span className="text-2xl font-bold text-white">+31%</span>
-                <span className="text-xs text-slate-400">earlier issue detection</span>
-              </div>
+                <div className="flex items-center gap-2 border-t border-slate-700/40" style={{ paddingTop: '1.25rem', marginBottom: '1.25rem' }}>
+                  <span className="text-2xl font-bold text-white">+31%</span>
+                  <span className="text-xs text-slate-400">earlier issue detection</span>
+                </div>
 
-              <Link to="/" className="flex items-center justify-center gap-2 rounded-xl text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
-                style={{ padding: '0.75rem', background: 'linear-gradient(135deg, #f59e0b, #f97316)', boxShadow: '0 4px 20px rgba(245,158,11,0.3)' }}>
-                View Trends <ArrowUpRight className="w-4 h-4" />              </Link>
-            </MagneticCard>          </div>
+                <Link to="/" className="flex items-center justify-center gap-2 rounded-xl text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:scale-[1.02]"
+                  style={{ padding: '0.75rem', background: 'linear-gradient(135deg, #f59e0b, #f97316)', boxShadow: '0 4px 20px rgba(245,158,11,0.3)' }}>
+                  View Trends <ArrowUpRight className="w-4 h-4" />              </Link>
+              </MagneticCard>          </div>
           </section>
         </ScrollReveal>
 
@@ -860,109 +860,108 @@ export default function Dashboard() {
         {/* CLIENTS */}
         <ScrollReveal direction="up" delay={0}>
           <section>
-          <SectionHeader title="Clients" subtitle="Active patients and their current health plans" />
+            <SectionHeader title="Clients" subtitle="Active patients and their current health plans" />
 
-          {/* Client stat pills */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5" style={{ marginBottom: '1.5rem' }}>
-            {[
-              { icon: Users,     label: 'Total Clients',  value: '1,284', change: '+12%', up: true,  iconBg: 'bg-sky-500/15',     iconColor: 'text-sky-400' },
-              { icon: UserCheck, label: 'Active',         value: '1,047', change: '+8%',  up: true,  iconBg: 'bg-emerald-500/15', iconColor: 'text-emerald-400' },
-              { icon: Crown,     label: 'Premium',        value: '386',   change: '+21%', up: true,  iconBg: 'bg-amber-500/15',   iconColor: 'text-amber-400' },
-              { icon: UserPlus,  label: 'New This Month', value: '57',    change: '-4%',  up: false, iconBg: 'bg-rose-500/15',    iconColor: 'text-rose-400' },            ].map(({ icon: Icon, label, value, change, up, iconBg, iconColor }, i) => (
-              <motion.div
-                key={label}
-                {...fadeUp(i * 0.07)}
-                className="rounded-2xl bg-slate-800/60 border border-slate-700/50 flex items-center gap-3 p-4 sm:p-6"
-              >
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${iconBg} flex items-center justify-center shrink-0`}>
-                  <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${iconColor}`} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xl sm:text-2xl font-bold text-white leading-tight">{value}</p>
-                  <p className="text-xs text-slate-400 truncate mt-0.5">{label}</p>
-                </div>
-                <span className={`text-xs font-semibold shrink-0 rounded-full ${up ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}`}
+            {/* Client stat pills */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5" style={{ marginBottom: '1.5rem' }}>
+              {[
+                { icon: Users, label: 'Total Clients', value: '1,284', change: '+12%', up: true, iconBg: 'bg-sky-500/15', iconColor: 'text-sky-400' },
+                { icon: UserCheck, label: 'Active', value: '1,047', change: '+8%', up: true, iconBg: 'bg-emerald-500/15', iconColor: 'text-emerald-400' },
+                { icon: Crown, label: 'Premium', value: '386', change: '+21%', up: true, iconBg: 'bg-amber-500/15', iconColor: 'text-amber-400' },
+                { icon: UserPlus, label: 'New This Month', value: '57', change: '-4%', up: false, iconBg: 'bg-rose-500/15', iconColor: 'text-rose-400' },].map(({ icon: Icon, label, value, change, up, iconBg, iconColor }, i) => (
+                  <motion.div
+                    key={label}
+                    {...fadeUp(i * 0.07)}
+                    className="rounded-2xl bg-slate-800/60 border border-slate-700/50 flex items-center gap-3 p-4 sm:p-6"
+                  >
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${iconBg} flex items-center justify-center shrink-0`}>
+                      <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${iconColor}`} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xl sm:text-2xl font-bold text-white leading-tight">{value}</p>
+                      <p className="text-xs text-slate-400 truncate mt-0.5">{label}</p>
+                    </div>
+                    <span className={`text-xs font-semibold shrink-0 rounded-full ${up ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}`}
                       style={{ padding: '0.25rem 0.5rem' }}>
-                  {change}
-                </span>
-              </motion.div>
-            ))}
-          </div>
+                      {change}
+                    </span>
+                  </motion.div>
+                ))}
+            </div>
 
-          {/* Client table */}
-          <motion.div {...fadeUp(0.15)} className="rounded-2xl bg-slate-800/60 border border-slate-700/50 overflow-hidden">            <div className="flex items-center justify-between border-b border-slate-700/50 px-4 py-3 sm:px-6 sm:py-4">
+            {/* Client table */}
+            <motion.div {...fadeUp(0.15)} className="rounded-2xl bg-slate-800/60 border border-slate-700/50 overflow-hidden">            <div className="flex items-center justify-between border-b border-slate-700/50 px-4 py-3 sm:px-6 sm:py-4">
               <h3 className="text-sm font-semibold text-white">Recent Clients</h3>
               <button className="text-xs text-sky-400 hover:text-sky-300 transition-colors">View All</button>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm min-w-130">
-                <thead>
-                  <tr className="text-xs text-slate-500 uppercase tracking-wider border-b border-slate-700/30">
-                    <th className="font-medium text-left px-4 py-3 sm:px-6">Client</th>
-                    <th className="font-medium text-left px-4 py-3 sm:px-6 hidden sm:table-cell">Age</th>
-                    <th className="font-medium text-left px-4 py-3 sm:px-6">Condition</th>
-                    <th className="font-medium text-left px-4 py-3 sm:px-6 hidden md:table-cell">Plan</th>
-                    <th className="font-medium text-left px-4 py-3 sm:px-6 hidden lg:table-cell">Last Visit</th>
-                    <th className="font-medium text-left px-4 py-3 sm:px-6">Status</th>
-                    <th className="px-4 py-3 sm:px-6"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {CLIENTS.map((c, i) => (
-                    <motion.tr
-                      key={c.name}
-                      {...fadeUp(0.1 + i * 0.05)}
-                      className="border-b border-slate-700/20 last:border-0 hover:bg-slate-700/20 transition-colors"
-                    >
-                      <td className="px-4 py-3 sm:px-6 sm:py-4">
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full ${c.avatarColor} flex items-center justify-center text-white text-xs font-bold shrink-0`}>
-                            {c.avatar}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm min-w-130">
+                  <thead>
+                    <tr className="text-xs text-slate-500 uppercase tracking-wider border-b border-slate-700/30">
+                      <th className="font-medium text-left px-4 py-3 sm:px-6">Client</th>
+                      <th className="font-medium text-left px-4 py-3 sm:px-6 hidden sm:table-cell">Age</th>
+                      <th className="font-medium text-left px-4 py-3 sm:px-6">Condition</th>
+                      <th className="font-medium text-left px-4 py-3 sm:px-6 hidden md:table-cell">Plan</th>
+                      <th className="font-medium text-left px-4 py-3 sm:px-6 hidden lg:table-cell">Last Visit</th>
+                      <th className="font-medium text-left px-4 py-3 sm:px-6">Status</th>
+                      <th className="px-4 py-3 sm:px-6"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {CLIENTS.map((c, i) => (
+                      <motion.tr
+                        key={c.name}
+                        {...fadeUp(0.1 + i * 0.05)}
+                        className="border-b border-slate-700/20 last:border-0 hover:bg-slate-700/20 transition-colors"
+                      >
+                        <td className="px-4 py-3 sm:px-6 sm:py-4">
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full ${c.avatarColor} flex items-center justify-center text-white text-xs font-bold shrink-0`}>
+                              {c.avatar}
+                            </div>
+                            <span className="text-white font-medium whitespace-nowrap text-xs sm:text-sm">{c.name}</span>
                           </div>
-                          <span className="text-white font-medium whitespace-nowrap text-xs sm:text-sm">{c.name}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 sm:px-6 sm:py-4 text-slate-400 text-xs sm:text-sm hidden sm:table-cell">{c.age}</td>
-                      <td className="px-4 py-3 sm:px-6 sm:py-4 text-slate-300 text-xs sm:text-sm">{c.condition}</td>
-                      <td className="px-4 py-3 sm:px-6 sm:py-4 hidden md:table-cell">
-                        {c.plan === 'Premium' ? (
-                          <span className="flex items-center gap-1 text-amber-400 text-xs font-medium">
-                            <Crown className="w-3 h-3" /> Premium
-                          </span>
-                        ) : (
-                          <span className="text-slate-400 text-xs">Standard</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 sm:px-6 sm:py-4 text-slate-400 text-xs whitespace-nowrap hidden lg:table-cell">{c.lastVisit}</td>
-                      <td className="px-4 py-3 sm:px-6 sm:py-4">
-                        <span className={`text-xs font-medium rounded-full px-2 py-1 ${
-                          c.status === 'Active' ? 'bg-emerald-500/15 text-emerald-400' :
-                          c.status === 'Review' ? 'bg-amber-500/15 text-amber-400' :
-                                                  'bg-slate-700/60 text-slate-400'
-                        }`}>{c.status}</span>
-                      </td>
-                      <td className="px-4 py-3 sm:px-6 sm:py-4">
-                        <button className="text-slate-500 hover:text-slate-300 transition-colors">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>          </motion.div>
-        </section>
+                        </td>
+                        <td className="px-4 py-3 sm:px-6 sm:py-4 text-slate-400 text-xs sm:text-sm hidden sm:table-cell">{c.age}</td>
+                        <td className="px-4 py-3 sm:px-6 sm:py-4 text-slate-300 text-xs sm:text-sm">{c.condition}</td>
+                        <td className="px-4 py-3 sm:px-6 sm:py-4 hidden md:table-cell">
+                          {c.plan === 'Premium' ? (
+                            <span className="flex items-center gap-1 text-amber-400 text-xs font-medium">
+                              <Crown className="w-3 h-3" /> Premium
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 text-xs">Standard</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 sm:px-6 sm:py-4 text-slate-400 text-xs whitespace-nowrap hidden lg:table-cell">{c.lastVisit}</td>
+                        <td className="px-4 py-3 sm:px-6 sm:py-4">
+                          <span className={`text-xs font-medium rounded-full px-2 py-1 ${c.status === 'Active' ? 'bg-emerald-500/15 text-emerald-400' :
+                              c.status === 'Review' ? 'bg-amber-500/15 text-amber-400' :
+                                'bg-slate-700/60 text-slate-400'
+                            }`}>{c.status}</span>
+                        </td>
+                        <td className="px-4 py-3 sm:px-6 sm:py-4">
+                          <button className="text-slate-500 hover:text-slate-300 transition-colors">
+                            <MoreHorizontal className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>          </motion.div>
+          </section>
         </ScrollReveal>
 
         <div className="section-divider" />
 
         {/* PREMIUM REVIEWS */}
         <ScrollReveal direction="up" delay={0}>
-        <section style={{ paddingBottom: '2rem' }}>
-          <SectionHeader title="Premium Client Reviews" subtitle="What our top-tier members are saying" />
+          <section style={{ paddingBottom: '2rem' }}>
+            <SectionHeader title="Premium Client Reviews" subtitle="What our top-tier members are saying" />
 
-          {/* Review cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">            {REVIEWS.map((r, i) => (
+            {/* Review cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">            {REVIEWS.map((r, i) => (
               <motion.div
                 key={r.name}
                 {...fadeUp(0.1 + i * 0.08)}
@@ -990,64 +989,64 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <span className="flex items-center gap-1 text-xs font-medium text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full shrink-0"
-                        style={{ padding: '0.3rem 0.75rem' }}>
+                    style={{ padding: '0.3rem 0.75rem' }}>
                     <Crown className="w-3 h-3" /> Premium
                   </span>
                 </div>
               </motion.div>
             ))}
-          </div>          {/* Overall rating summary */}
-          <motion.div
-            {...fadeUp(0.3)}
-            className="rounded-2xl bg-slate-800/60 border border-slate-700/50 flex flex-col md:flex-row items-center gap-6 md:gap-10 p-6 sm:p-8"
-            style={{ marginTop: '1.5rem' }}
-          >
-            {/* Score */}
-            <div className="text-center shrink-0">
-              <p className="text-5xl sm:text-6xl font-bold text-white">4.9</p>
-              <div className="flex items-center justify-center gap-1 mt-1.5">
-                {Array.from({ length: 5 }).map((_, s) => (
-                  <Star key={s} className="w-4 h-4 text-amber-400 fill-amber-400" />
+            </div>          {/* Overall rating summary */}
+            <motion.div
+              {...fadeUp(0.3)}
+              className="rounded-2xl bg-slate-800/60 border border-slate-700/50 flex flex-col md:flex-row items-center gap-6 md:gap-10 p-6 sm:p-8"
+              style={{ marginTop: '1.5rem' }}
+            >
+              {/* Score */}
+              <div className="text-center shrink-0">
+                <p className="text-5xl sm:text-6xl font-bold text-white">4.9</p>
+                <div className="flex items-center justify-center gap-1 mt-1.5">
+                  {Array.from({ length: 5 }).map((_, s) => (
+                    <Star key={s} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                  ))}
+                </div>
+                <p className="text-slate-500 text-xs mt-1">Based on 386 reviews</p>
+              </div>
+
+              {/* Bars */}
+              <div className="flex-1 w-full flex flex-col gap-2.5">
+                {[
+                  { label: '5 stars', pct: 78 },
+                  { label: '4 stars', pct: 16 },
+                  { label: '3 stars', pct: 4 },
+                  { label: '2 stars', pct: 1 },
+                  { label: '1 star', pct: 1 },
+                ].map(({ label, pct }) => (
+                  <div key={label} className="flex items-center gap-3">
+                    <span className="text-xs text-slate-400 shrink-0 w-12">{label}</span>
+                    <div className="flex-1 h-2 bg-slate-700/60 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${pct}%` }}
+                        transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
+                        className="h-full bg-amber-400 rounded-full"
+                      />
+                    </div>
+                    <span className="text-xs text-slate-400 shrink-0 w-8 text-right">{pct}%</span>
+                  </div>
                 ))}
               </div>
-              <p className="text-slate-500 text-xs mt-1">Based on 386 reviews</p>
-            </div>
 
-            {/* Bars */}
-            <div className="flex-1 w-full flex flex-col gap-2.5">
-              {[
-                { label: '5 stars', pct: 78 },
-                { label: '4 stars', pct: 16 },
-                { label: '3 stars', pct: 4  },
-                { label: '2 stars', pct: 1  },
-                { label: '1 star',  pct: 1  },
-              ].map(({ label, pct }) => (
-                <div key={label} className="flex items-center gap-3">
-                  <span className="text-xs text-slate-400 shrink-0 w-12">{label}</span>
-                  <div className="flex-1 h-2 bg-slate-700/60 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${pct}%` }}
-                      transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
-                      className="h-full bg-amber-400 rounded-full"
-                    />
-                  </div>
-                  <span className="text-xs text-slate-400 shrink-0 w-8 text-right">{pct}%</span>
+              {/* Verified badge */}
+              <div className="flex flex-col items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
+                  <BadgeCheck className="w-5 h-5" />
+                  Verified Reviews
                 </div>
-              ))}
-            </div>
-
-            {/* Verified badge */}
-            <div className="flex flex-col items-center gap-2 shrink-0">
-              <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
-                <BadgeCheck className="w-5 h-5" />
-                Verified Reviews
-              </div>
-              <p className="text-slate-500 text-xs text-center max-w-32">
-                All reviews from active premium members
-              </p>
-            </div>          </motion.div>
-        </section>
+                <p className="text-slate-500 text-xs text-center max-w-32">
+                  All reviews from active premium members
+                </p>
+              </div>          </motion.div>
+          </section>
         </ScrollReveal>
 
       </div>

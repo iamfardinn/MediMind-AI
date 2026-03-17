@@ -181,9 +181,9 @@ function LoggedOutGate() {
           <div className="relative">
             <div className="absolute -inset-4 rounded-3xl opacity-20"
                  style={{ background: 'radial-gradient(ellipse, rgba(16,185,129,.1), transparent 70%)', filter: 'blur(22px)' }} />
-            <div className="relative rounded-2xl p-6 sm:p-8"
+            <div className="relative rounded-2xl p-6 sm:p-8 flex flex-col gap-6"
                  style={{ background: 'rgba(15,23,42,.6)', border: '1px solid rgba(51,65,85,.4)', backdropFilter: 'blur(18px)' }}>
-              <div className="grid grid-cols-2 gap-3 mb-7">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {features.map((f, i) => (
                   <motion.div key={f.text}
                     initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
@@ -195,7 +195,7 @@ function LoggedOutGate() {
                   </motion.div>
                 ))}
               </div>
-              <div className="h-px mb-7" style={{ background: 'linear-gradient(90deg,transparent,rgba(51,65,85,.5),transparent)' }} />
+              <div className="h-px w-full" style={{ background: 'linear-gradient(90deg,transparent,rgba(51,65,85,.5),transparent)' }} />
               <div className="flex flex-col items-center gap-3">
                 <Link to="/login"
                   className="group w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-white font-semibold text-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
@@ -233,7 +233,7 @@ function FreePlanGate() {
     { name: 'Premium',  price: '$19.99/mo', color: '#8b5cf6', features: ['Everything in Standard', 'Doctor Consultations', 'Priority Support'] },
   ]
   return (
-    <div className="w-full min-h-screen relative overflow-hidden">
+    <div className="w-full min-h-screen relative overflow-hidden flex flex-col items-center">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 rounded-full opacity-25"
              style={{ width: '44rem', height: '32rem', background: 'radial-gradient(ellipse, rgba(139,92,246,0.12) 0%, transparent 70%)' }} />
@@ -287,12 +287,12 @@ function FreePlanGate() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-7 w-full max-w-2xl mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 w-full max-w-2xl mb-12">
           {plans.map((p, i) => (
             <motion.div key={p.name}
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: .3 + i * .1, ease: [0.22,1,0.36,1] }}
-              className="relative rounded-3xl p-7 sm:p-8 transition-all duration-300 hover:scale-[1.02] group"
+              className="relative rounded-3xl p-6 sm:p-8 transition-all duration-300 hover:scale-[1.02] group"
               style={{ background: 'linear-gradient(145deg, #131f35, #0d1627)', border: `1.5px solid ${p.color}28`, backdropFilter: 'blur(16px)' }}>
               {/* top accent */}
               <div style={{ position: 'absolute', top: 0, left: '20%', right: '20%', height: '1.5px', background: `linear-gradient(90deg, transparent, ${p.color}60, transparent)`, borderRadius: '9999px' }} />
@@ -459,7 +459,7 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
           boxShadow: '0 8px 40px rgba(0,0,0,0.3)',
         }}
       >
-        <div className="flex flex-col gap-7">
+        <div className="flex flex-col gap-8">
 
           {/* symptoms textarea */}
           <Field
@@ -641,7 +641,7 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
             className="w-full max-w-2xl mb-8"
           >
             <div
-              className="flex flex-col gap-6 p-7 sm:p-9"
+              className="flex flex-col gap-6 p-6 sm:p-10"
               style={{
                 background: 'linear-gradient(160deg, #131f35, #0d1525)',
                 border: '1px solid rgba(51,65,85,0.5)',
