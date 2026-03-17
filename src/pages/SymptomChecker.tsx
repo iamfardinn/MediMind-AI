@@ -160,7 +160,7 @@ function LoggedOutGate() {
         {/* Steps */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .28, duration: .45 }}
           style={{ maxWidth: '700px', margin: '0 auto', marginBottom: '3rem' }}>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {steps.map((step, i) => (
               <motion.div key={step.num}
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
@@ -251,14 +251,14 @@ function FreePlanGate() {
              style={{ backgroundImage: 'linear-gradient(rgba(148,163,184,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.5) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
       </div>
 
-      <div className="relative z-10 w-full flex flex-col items-center px-5 sm:px-8 pt-24 sm:pt-32 pb-20 max-w-4xl mx-auto">
+      <div className="relative z-10 w-full flex flex-col items-center gap-10 sm:gap-14 px-5 sm:px-8 pt-24 sm:pt-32 pb-20 max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .5 }}
-          className="flex flex-col items-center text-center mb-12 w-full">
+          className="flex flex-col items-center text-center w-full">
 
           {/* Icon */}
           <motion.div initial={{ scale: .82, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: .1, type: 'spring', stiffness: 200 }}
-            className="relative inline-flex mb-8">
+            className="relative inline-flex mb-6">
             <div className="w-20 h-20 rounded-3xl flex items-center justify-center"
                  style={{ background: 'linear-gradient(135deg, rgba(139,92,246,.18), rgba(14,165,233,.18))', border: '1px solid rgba(139,92,246,.28)', boxShadow: '0 0 40px rgba(139,92,246,0.15)' }}>
               <Crown className="w-9 h-9 text-violet-400" />
@@ -278,7 +278,7 @@ function FreePlanGate() {
             Premium Feature
           </motion.div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-4 leading-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
             Upgrade to unlock the{' '}
             <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-sky-400 bg-clip-text text-transparent">Symptom Analyzer</span>
           </h1>
@@ -287,7 +287,7 @@ function FreePlanGate() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 w-full max-w-2xl mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 w-full max-w-2xl">
           {plans.map((p, i) => (
             <motion.div key={p.name}
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
@@ -325,7 +325,7 @@ function FreePlanGate() {
         </div>
 
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .55 }}
-          className="flex flex-col items-center gap-4">
+          className="flex flex-col items-center gap-6">
           <Link to="/pricing"
             className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-xl text-white font-semibold text-sm transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl shadow-lg"
             style={{ background: 'linear-gradient(135deg, #8b5cf6, #0ea5e9)', boxShadow: '0 8px 32px rgba(139,92,246,.25)' }}>
@@ -524,7 +524,7 @@ Be concise, clear, and empathetic. Always recommend professional consultation.`
 
           {/* Severity */}
           <Field label="Severity Level" icon={AlertTriangle} iconColor="#fbbf24">
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {SEVERITY_OPTIONS.map(({ label, emoji, color, activeClass }) => {
                 const isActive = severity === label
                 return (
