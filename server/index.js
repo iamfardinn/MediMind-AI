@@ -43,6 +43,7 @@ app.use(cors({
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:3000',
+    'https://medimindai1.netlify.app',
   ],
   credentials: true,
 }))
