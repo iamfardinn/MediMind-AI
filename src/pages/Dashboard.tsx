@@ -11,7 +11,7 @@ import {
 import {
   Heart, Thermometer, Wind, Activity, TrendingUp,
   Brain, Shield, Zap, ArrowUpRight, CalendarDays,
-  Users, UserCheck, UserPlus, Star, Crown, BadgeCheck, MoreHorizontal, TrendingDown, Minus, MessageSquare, Stethoscope, LayoutDashboard, CreditCard, Sparkles,
+  Users, UserCheck, UserPlus, Star, Crown, BadgeCheck, MoreHorizontal, TrendingDown, Minus, MessageSquare, Stethoscope, LayoutDashboard, CreditCard,
 } from 'lucide-react'
 import { useChatStore } from '../store/useChatStore'
 import { Link } from 'react-router-dom'
@@ -477,7 +477,7 @@ function MagneticCard({ children, glowColor, className, style }: {
         scale: 1,
         duration: 0.6,
         ease: 'elastic.out(1, 0.5)',
-        boxShadow: 'none',
+        boxShadow: style?.boxShadow || 'none',
       })
       gsap.to(glow, { opacity: 0, duration: 0.4 })
     }
@@ -586,14 +586,8 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium"
-            style={{
-              background: 'rgba(14,165,233,0.08)',
-              border: '1px solid rgba(14,165,233,0.15)',
-              color: '#7dd3fc',
-            }}
+            className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium bg-sky-500/10 border border-sky-500/20 text-sky-300 shadow-sm"
           >
-            <Sparkles className="w-3.5 h-3.5" />
             <CalendarDays className="w-3.5 h-3.5" />
             <span>{today}</span>
           </motion.div>
@@ -624,35 +618,29 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="flex flex-wrap items-center justify-center gap-3 mt-2"
+            className="flex flex-wrap items-center justify-center gap-3.5 mt-3"
           >
-            <Link to="/chat">
+            <Link to="/chat" className="inline-block">
               <motion.div
-                whileHover={{ scale: 1.05, y: -2 }}
+                whileHover={{ scale: 1.04, y: -2 }}
                 whileTap={{ scale: 0.97 }}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white"
+                className="flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold text-white cursor-pointer shadow-lg shadow-sky-500/25 transition-all"
                 style={{
                   background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
-                  boxShadow: '0 4px 24px rgba(14,165,233,0.35)',
                 }}
               >
                 <Brain className="w-4 h-4" />
-                Start AI Chat
+                <span>Start AI Chat</span>
               </motion.div>
             </Link>
-            <Link to="/symptoms">
+            <Link to="/symptoms" className="inline-block">
               <motion.div
-                whileHover={{ scale: 1.05, y: -2 }}
+                whileHover={{ scale: 1.04, y: -2 }}
                 whileTap={{ scale: 0.97 }}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold"
-                style={{
-                  color: '#94a3b8',
-                  background: 'rgba(30,41,59,0.6)',
-                  border: '1px solid rgba(51,65,85,0.5)',
-                }}
+                className="flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 hover:border-slate-600 cursor-pointer transition-all shadow-md"
               >
-                <Shield className="w-4 h-4" />
-                Check Symptoms
+                <Shield className="w-4 h-4 text-emerald-400" />
+                <span>Check Symptoms</span>
               </motion.div>
             </Link>
           </motion.div>
@@ -895,7 +883,7 @@ export default function Dashboard() {
               <button className="text-xs text-sky-400 hover:text-sky-300 transition-colors">View All</button>
             </div>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm min-w-130">
+                <table className="w-full text-sm min-w-[620px]">
                   <thead>
                     <tr className="text-xs text-slate-500 uppercase tracking-wider border-b border-slate-700/30">
                       <th className="font-medium text-left px-4 py-3 sm:px-6">Client</th>

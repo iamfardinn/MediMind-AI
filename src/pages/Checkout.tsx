@@ -81,56 +81,68 @@ function StripeForm({
   }
 
   const inputBox: React.CSSProperties = {
-    padding: '0.875rem 1rem',
-    borderRadius: '0.75rem',
-    background: 'rgba(15,23,42,0.8)',
-    border: '1px solid rgba(51,65,85,0.6)',
+    padding: '0.875rem 1.125rem',
+    borderRadius: '0.875rem',
+    background: 'rgba(15,23,42,0.85)',
+    border: '1px solid rgba(51,65,85,0.7)',
+    transition: 'all 0.2s ease',
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div>
-        <label style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600, display: 'block', marginBottom: '0.5rem', letterSpacing: '0.03em' }}>CARD NUMBER</label>
-        <div style={inputBox}><CardNumberElement options={STRIPE_STYLE} /></div>
+        <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+          Card Number
+        </label>
+        <div style={inputBox} className="focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20">
+          <CardNumberElement options={STRIPE_STYLE} />
+        </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600, display: 'block', marginBottom: '0.5rem', letterSpacing: '0.03em' }}>EXPIRY</label>
-          <div style={inputBox}><CardExpiryElement options={STRIPE_STYLE} /></div>
+          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+            Expiration Date
+          </label>
+          <div style={inputBox} className="focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20">
+            <CardExpiryElement options={STRIPE_STYLE} />
+          </div>
         </div>
         <div>
-          <label style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600, display: 'block', marginBottom: '0.5rem', letterSpacing: '0.03em' }}>CVC</label>
-          <div style={inputBox}><CardCvcElement options={STRIPE_STYLE} /></div>
+          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+            CVC Security Code
+          </label>
+          <div style={inputBox} className="focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20">
+            <CardCvcElement options={STRIPE_STYLE} />
+          </div>
         </div>
       </div>
       <motion.button
         type="submit"
         disabled={!stripe || processing}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        whileHover={!processing ? { scale: 1.015, y: -1 } : {}}
+        whileTap={!processing ? { scale: 0.985 } : {}}
+        className="mt-3 w-full py-3.5 px-5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:cursor-not-allowed shadow-lg shadow-sky-500/20"
         style={{
-          marginTop: '0.5rem',
-          padding: '1rem',
-          borderRadius: '0.875rem',
           background: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
-          color: '#fff',
-          fontWeight: 700,
-          fontSize: '0.95rem',
-          border: 'none',
-          cursor: processing ? 'not-allowed' : 'pointer',
-          opacity: processing ? 0.7 : 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '0.5rem',
-          boxShadow: '0 8px 28px rgba(14,165,233,0.35)',
+          opacity: processing ? 0.75 : 1,
         }}
       >
-        {processing ? <><Loader2 style={{ width: '1rem', height: '1rem', animation: 'spin 1s linear infinite' }} /> Processing…</> : <><Lock style={{ width: '0.9rem', height: '0.9rem' }} /> Pay with Stripe</>}
+        {processing ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Processing Secure Payment…</span>
+          </>
+        ) : (
+          <>
+            <Lock className="w-4 h-4" />
+            <span>Pay with Stripe</span>
+          </>
+        )}
       </motion.button>
-      <p style={{ textAlign: 'center', fontSize: '0.72rem', color: '#475569' }}>
-        🔒 Secured by Stripe · 256-bit SSL encryption
-      </p>
+      <div className="flex items-center justify-center gap-2 text-xs text-slate-500 mt-1">
+        <Shield className="w-3.5 h-3.5 text-emerald-400" />
+        <span>256-bit End-to-End SSL Encryption · PCI DSS Level 1</span>
+      </div>
     </form>
   )
 }
@@ -445,84 +457,83 @@ export default function Checkout() {
   const planColor = planId === 'premium' ? '#f59e0b' : planId === 'standard' ? '#0ea5e9' : '#64748b'
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0b1221', padding: '2rem 1rem 6rem' }}>
+    <div className="min-h-screen bg-[#0b1221] px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pb-24">
       {/* Ambient */}
       <div style={{ position: 'fixed', top: '-10rem', left: '50%', transform: 'translateX(-50%)', width: '700px', height: '400px', background: 'radial-gradient(ellipse, rgba(14,165,233,0.07) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0, borderRadius: '50%' }} />
 
-      <div style={{ position: 'relative', zIndex: 1, maxWidth: '980px', margin: '0 auto' }}>
+      <div className="relative z-10 max-w-5xl mx-auto">
 
         {/* Back */}
-        <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} style={{ marginBottom: '2rem' }}>
+        <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} className="mb-6 sm:mb-8">
           <button
             onClick={() => navigate('/pricing')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#f1f5f9')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#64748b')}
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium cursor-pointer"
           >
-            <ArrowLeft style={{ width: '1rem', height: '1rem' }} /> Back to Pricing
+            <ArrowLeft className="w-4 h-4" /> Back to Pricing
           </button>
         </motion.div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: '2rem', alignItems: 'start' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 
           {/* ── Left: Order Summary ── */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45 }}
+            className="lg:col-span-5"
           >
-            <h1 style={{ fontSize: '1.6rem', fontWeight: 700, color: '#f8fafc', marginBottom: '1.75rem' }}>Order Summary</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-white mb-6">Order Summary</h1>
 
             {/* Plan card */}
-            <div style={{ borderRadius: '1.25rem', overflow: 'hidden', border: `1px solid ${planColor}33`, boxShadow: `0 0 40px ${planColor}12`, marginBottom: '1.5rem' }}>
+            <div className="rounded-2xl overflow-hidden border border-slate-700/60 shadow-xl mb-6" style={{ borderColor: `${planColor}33`, boxShadow: `0 0 32px ${planColor}10` }}>
               <div style={{ height: '3px', background: planId === 'premium' ? 'linear-gradient(90deg,#f59e0b,#ef4444)' : 'linear-gradient(90deg,#0ea5e9,#6366f1)' }} />
-              <div style={{ padding: '1.5rem', background: 'linear-gradient(160deg,#111d2e,#0b1221)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: '1.25rem' }}>
-                  <div style={{ width: '2.75rem', height: '2.75rem', borderRadius: '0.75rem', background: `${planColor}22`, border: `1px solid ${planColor}44`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <PlanIcon style={{ width: '1.2rem', height: '1.2rem', color: planColor }} />
+              <div className="p-5 sm:p-6" style={{ background: 'linear-gradient(160deg,#111d2e,#0b1221)' }}>
+                <div className="flex items-center gap-3.5 mb-5">
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${planColor}22`, border: `1px solid ${planColor}44` }}>
+                    <PlanIcon className="w-5 h-5" style={{ color: planColor }} />
                   </div>
                   <div>
-                    <p style={{ fontSize: '1.1rem', fontWeight: 700, color: '#f1f5f9' }}>{PLAN_LABELS[planId]} Plan</p>
-                    <p style={{ fontSize: '0.78rem', color: '#64748b', textTransform: 'capitalize' }}>{billing} billing</p>
+                    <p className="text-base font-bold text-slate-100">{PLAN_LABELS[planId]} Plan</p>
+                    <p className="text-xs text-slate-400 capitalize">{billing} billing</p>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.25rem' }}>
+                <div className="flex flex-col gap-2.5 mb-5">
                   {[
                     planId === 'standard' ? 'Symptom Analyzer' : 'Everything in Standard',
                     'Unlimited AI Chat',
                     planId === 'premium' ? 'Priority AI Response' : 'Health Dashboard',
                     planId === 'premium' ? 'Detailed Health Reports + Export' : 'Health Tips Feed',
                   ].map(f => (
-                    <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                      <CheckCircle style={{ width: '0.875rem', height: '0.875rem', color: planColor, flexShrink: 0 }} />
-                      <span style={{ fontSize: '0.83rem', color: '#94a3b8' }}>{f}</span>
+                    <div key={f} className="flex items-center gap-2.5">
+                      <CheckCircle className="w-3.5 h-3.5 shrink-0" style={{ color: planColor }} />
+                      <span className="text-xs text-slate-300">{f}</span>
                     </div>
                   ))}
                 </div>
 
-                <div style={{ height: '1px', background: 'rgba(51,65,85,0.4)', marginBottom: '1.25rem' }} />
+                <div className="h-px bg-slate-700/40 mb-5" />
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Total {billing === 'yearly' ? '(billed yearly)' : '(billed monthly)'}</span>
-                  <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: '1.8rem', fontWeight: 800, color: '#f8fafc' }}>${price}</span>
-                    <span style={{ fontSize: '0.8rem', color: '#64748b' }}>{billing === 'yearly' ? '/yr' : '/mo'}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-slate-400">Total {billing === 'yearly' ? '(billed yearly)' : '(billed monthly)'}</span>
+                  <div className="text-right">
+                    <span className="text-2xl font-extrabold text-white">${price}</span>
+                    <span className="text-xs text-slate-400 ml-1">{billing === 'yearly' ? '/yr' : '/mo'}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Trust badges */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+            <div className="flex flex-col gap-2.5 px-1">
               {[
                 { icon: Lock,   text: '256-bit SSL encryption' },
                 { icon: Shield, text: 'PCI DSS compliant' },
                 { icon: CheckCircle, text: 'Cancel anytime, no questions asked' },
               ].map(({ icon: I, text }) => (
-                <div key={text} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                  <I style={{ width: '0.875rem', height: '0.875rem', color: '#34d399', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>{text}</span>
+                <div key={text} className="flex items-center gap-2.5">
+                  <I className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="text-xs text-slate-400">{text}</span>
                 </div>
               ))}
             </div>
@@ -533,14 +544,16 @@ export default function Checkout() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.1 }}
-            style={{ borderRadius: '1.5rem', background: 'linear-gradient(160deg,#111d2e,#0b1221)', border: '1px solid rgba(51,65,85,0.4)', overflow: 'hidden' }}          >
-            <div style={{ padding: '2rem' }}>
-                <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#f8fafc', marginBottom: '1.75rem' }}>
+            className="lg:col-span-7 rounded-2xl border border-slate-700/60 overflow-hidden shadow-2xl"
+            style={{ background: 'linear-gradient(160deg,#111d2e,#0b1221)' }}
+          >
+            <div className="p-5 sm:p-8">
+                <h2 className="text-lg sm:text-xl font-bold text-white mb-6">
                   Payment Method
                 </h2>
 
                 {/* Gateway selector */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem', marginBottom: '2rem' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
                   {([
                     { id: 'stripe',     label: 'Stripe',      sub: 'Card / Apple Pay',  color: '#6366f1' },
                     { id: 'sslcommerz', label: 'SSLCommerz',  sub: 'bKash / Nagad +',   color: '#16a34a' },
@@ -548,22 +561,22 @@ export default function Checkout() {
                     <button
                       key={g.id}
                       onClick={() => { setGateway(g.id); setError('') }}
+                      className={`p-4 rounded-xl text-left transition-all cursor-pointer ${
+                        gateway === g.id
+                          ? 'border-2 ring-1'
+                          : 'border border-slate-700/50 bg-slate-900/50 hover:border-slate-600'
+                      }`}
                       style={{
-                        padding: '1rem',
-                        borderRadius: '0.875rem',
-                        border: gateway === g.id ? `2px solid ${g.color}` : '1px solid rgba(51,65,85,0.5)',
-                        background: gateway === g.id ? `${g.color}14` : 'rgba(15,23,42,0.5)',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'all 0.18s',
-                        boxShadow: gateway === g.id ? `0 0 20px ${g.color}22` : 'none',
+                        borderColor: gateway === g.id ? g.color : undefined,
+                        background: gateway === g.id ? `${g.color}15` : undefined,
+                        boxShadow: gateway === g.id ? `0 0 20px ${g.color}20` : 'none',
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                        <CreditCard style={{ width: '1rem', height: '1rem', color: g.color }} />
-                        <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f1f5f9' }}>{g.label}</span>
+                      <div className="flex items-center gap-2 mb-1">
+                        <CreditCard className="w-4 h-4" style={{ color: g.color }} />
+                        <span className="text-sm font-bold text-white">{g.label}</span>
                       </div>
-                      <p style={{ fontSize: '0.72rem', color: '#64748b' }}>{g.sub}</p>
+                      <p className="text-xs text-slate-400">{g.sub}</p>
                     </button>
                   ))}
                 </div>

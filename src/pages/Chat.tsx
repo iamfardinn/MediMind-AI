@@ -147,14 +147,13 @@ export default function Chat() {
 
               {/* CTA */}
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .6 }}
-                className="flex flex-col sm:flex-row items-center lg:items-start gap-5 mt-4">
+                className="flex flex-col sm:flex-row items-center lg:items-start gap-4 mt-2">
                 <Link to="/login"
-                  className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-xl text-white font-semibold text-sm transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl shadow-lg"
-                  style={{ padding: "10px", marginTop: "20px", background: 'linear-gradient(135deg,#0ea5e9,#6366f1)', boxShadow: '0 8px 32px rgba(14,165,233,.25)' }}>
-                  Sign In to Start Chatting
+                  className="group inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-xl text-white font-bold text-sm transition-all duration-300 hover:scale-[1.03] shadow-lg shadow-sky-500/25"
+                  style={{ background: 'linear-gradient(135deg,#0ea5e9,#6366f1)' }}>
+                  <span>Sign In to Start Chatting</span>
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
-                <span className=" text-xs text-slate-500 sm:self-center"></span>
               </motion.div>
             </motion.div>
 
@@ -339,10 +338,9 @@ export default function Chat() {
                   <button
                     key={prompt}
                     onClick={() => { setInput(prompt); textareaRef.current?.focus() }}
-                    className="text-left text-xs sm:text-sm px-4 py-3 sm:py-3.5 rounded-xl transition-all duration-200 text-slate-400 hover:text-white hover:bg-white/5"
-                    style={{ border: '1px solid rgba(51,65,85,0.5)' }}
+                    className="text-left text-xs sm:text-sm px-4 py-3 sm:py-3.5 rounded-xl transition-all duration-200 text-slate-300 hover:text-white bg-slate-900/60 hover:bg-slate-800/80 border border-slate-700/60 hover:border-sky-500/50 hover:shadow-lg hover:shadow-sky-500/10 cursor-pointer"
                   >
-                    {prompt}
+                    💬 {prompt}
                   </button>
                 ))}
               </div>
