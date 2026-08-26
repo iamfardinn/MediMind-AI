@@ -1,12 +1,9 @@
 import OpenAI from 'openai'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
-const TOKEN = import.meta.env.VITE_GITHUB_TOKEN || ''
-
-const client = new OpenAI({
-  baseURL: 'https://models.inference.ai.azure.com',
-  apiKey: TOKEN,
-  dangerouslyAllowBrowser: true,
-})
+const GITHUB_TOKEN = (import.meta.env.VITE_GITHUB_TOKEN || '').trim()
+const GEMINI_API_KEY = (import.meta.env.VITE_GEMINI_API_KEY || '').trim()
+const OPENAI_API_KEY = (import.meta.env.VITE_OPENAI_API_KEY || '').trim()
 
 const SYSTEM_PROMPT = `You are MediMind AI, an advanced medical assistant.
 You help users understand their symptoms, provide general health information, suggest when to see a doctor, and offer wellness advice.
@@ -25,39 +22,91 @@ export async function streamGeminiResponse(
   onDone: () => void,
   onError: (err: string) => void
 ) {
-  try {
-    if (!TOKEN) {
-      onError('No GitHub token found. Please add VITE_GITHUB_TOKEN to your .env file.\n\nGet a free token at https://github.com/settings/tokens — needs no special scopes for Copilot models.')
+  // 1. Try Google Gemini if key is provided
+  if (GEMINI_API_KEY) {
+    try {
+      const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-1.5-flash',
+        systemInstruction: SYSTEM_PROMPT,
+      })
+      const result = await model.generateContentStream(userMessage)
+      for await (const chunk of result.stream) {
+        const text = chunk.text()
+        if (text) onChunk(text)
+      }
+      onDone()
+      return
+    } catch (geminiErr: unknown) {
+      console.warn('Gemini stream failed, trying fallback:', geminiErr)
+    }
+  }
+
+  // 2. Try OpenAI API if key is provided
+  if (OPENAI_API_KEY) {
+    try {
+      const openai = new OpenAI({
+        apiKey: OPENAI_API_KEY,
+        dangerouslyAllowBrowser: true,
+      })
+      const stream = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: userMessage },
+        ],
+        stream: true,
+      })
+      for await (const chunk of stream) {
+        const text = chunk.choices[0]?.delta?.content ?? ''
+        if (text) onChunk(text)
+      }
+      onDone()
+      return
+    } catch (openaiErr: unknown) {
+      console.warn('OpenAI stream failed, trying fallback:', openaiErr)
+    }
+  }
+
+  // 3. Try GitHub Models
+  if (GITHUB_TOKEN) {
+    try {
+      const client = new OpenAI({
+        baseURL: 'https://models.inference.ai.azure.com',
+        apiKey: GITHUB_TOKEN,
+        dangerouslyAllowBrowser: true,
+      })
+      const stream = await client.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: userMessage },
+        ],
+        stream: true,
+      })
+
+      for await (const chunk of stream) {
+        const text = chunk.choices[0]?.delta?.content ?? ''
+        if (text) onChunk(text)
+      }
+
+      onDone()
+      return
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error occurred'
+      if (message.includes('401') || message.toLowerCase().includes('unauthorized')) {
+        onError('GitHub Token is invalid or expired. You can add a free Google Gemini API key (VITE_GEMINI_API_KEY) from https://aistudio.google.com/app/apikey')
+      } else if (message.includes('429') || message.toLowerCase().includes('rate limit')) {
+        onError('Rate limit reached. Please wait a moment and try again.')
+      } else {
+        onError(message)
+      }
       onDone()
       return
     }
-
-    const stream = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user',   content: userMessage },
-      ],
-      stream: true,
-    })
-
-    for await (const chunk of stream) {
-      const text = chunk.choices[0]?.delta?.content ?? ''
-      if (text) onChunk(text)
-    }
-
-    onDone()
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error occurred'
-
-    if (message.includes('401') || message.toLowerCase().includes('unauthorized')) {
-      onError('Invalid or expired GitHub token. Please check your VITE_GITHUB_TOKEN in the .env file.')
-    } else if (message.includes('429') || message.toLowerCase().includes('rate limit')) {
-      onError('Rate limit reached. Please wait a moment and try again.')
-    } else {
-      onError(message)
-    }
-
-    onDone()
   }
+
+  // If no keys configured at all
+  onError('No AI API key found. Please add VITE_GEMINI_API_KEY (free at https://aistudio.google.com/app/apikey) or VITE_GITHUB_TOKEN in your .env.local file and on Netlify.')
+  onDone()
 }

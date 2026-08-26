@@ -4,7 +4,9 @@ const { Pool } = require('pg')
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  // In production add: ssl: { rejectUnauthorized: false }
+  ssl: process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('localhost')
+    ? { rejectUnauthorized: false }
+    : false,
 })
 
 // ── Auto-create tables on first run ──────────────────────────────────────────
