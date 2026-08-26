@@ -26,10 +26,18 @@ export async function streamGeminiResponse(
   if (GEMINI_API_KEY) {
     try {
       const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
-      const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
-        systemInstruction: SYSTEM_PROMPT,
-      })
+      let model
+      try {
+        model = genAI.getGenerativeModel({
+          model: 'gemini-3.6-flash',
+          systemInstruction: SYSTEM_PROMPT,
+        })
+      } catch {
+        model = genAI.getGenerativeModel({
+          model: 'gemini-3.5-flash-lite',
+          systemInstruction: SYSTEM_PROMPT,
+        })
+      }
       const result = await model.generateContentStream(userMessage)
       for await (const chunk of result.stream) {
         const text = chunk.text()
